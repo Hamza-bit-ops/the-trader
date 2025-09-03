@@ -93,7 +93,7 @@ export default function Navbar() {
           <ul className="flex flex-col p-4 font-medium space-y-1">
             {[
               { href: "/", label: "Home" },
-              { href: "/courses", label: "Courses" },
+              { href: "/students", label: "students" },
               { href: "/about", label: "About" },
               { href: "/contact", label: "Contact" }
             ].map((item, index) => (
