@@ -1,6 +1,6 @@
   import type { Metadata } from "next";
   import "./globals.css";
-  import Navbar from "../src/components/navbar";
+  import Navbar from "@/src/components/navbar";
 
   export const metadata: Metadata = {
     title: "Forex Academy - Learn Forex Trading",

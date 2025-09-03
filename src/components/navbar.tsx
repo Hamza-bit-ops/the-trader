@@ -40,7 +40,7 @@ export default function Navbar() {
         <ul className="hidden md:flex space-x-8 font-medium">
           {[
             { href: "/", label: "Home" },
-            { href: "/students", label: "Courses" },
+            { href: "/students", label: "Students" },
             { href: "/about", label: "About" },
             { href: "/contact", label: "Contact" }
           ].map((item, index) => (

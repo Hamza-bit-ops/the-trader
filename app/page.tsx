@@ -1,6 +1,5 @@
 'use client'
 
-import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
@@ -266,7 +265,7 @@ export default function Home() {
                     <div className="text-gray-500 text-sm">{testimonial.role}</div>
                   </div>
                 </div>
-                <p className="text-gray-600 italic leading-relaxed">"{testimonial.content}"</p>
+                <p className="text-gray-600 italic leading-relaxed">{testimonial.content}</p>
                 <div className="flex text-yellow-400 mt-3">
                   {[...Array(5)].map((_, i) => (
                     <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 20 20">
