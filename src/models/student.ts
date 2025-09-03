@@ -31,6 +31,7 @@ const StudentSchema = new Schema<IStudent>(
     notes: { type: String },
   },
   { timestamps: true }
+  
 );
 
 export default models.Student || mongoose.model<IStudent>("Student", StudentSchema);
