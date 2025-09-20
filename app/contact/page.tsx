@@ -43,6 +43,7 @@ export default function ContactPage() {
     }));
   };
 
+  
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle form submission here
