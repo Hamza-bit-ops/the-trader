@@ -306,7 +306,7 @@ export default function CoursesPage() {
 
                   {/* Course Features */}
                   <div className="mb-6">
-                    <h4 className="text-white font-semibold mb-3">What You'll Learn:</h4>
+                    <h4 className="text-white font-semibold mb-3">What You ll Learn:</h4>
                     <ul className="space-y-2">
                       {course.features.map((feature, idx) => (
                         <li key={idx} className="flex items-center text-slate-300 text-sm">

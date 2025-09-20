@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { PlusCircle, Search, Filter, Edit, Trash2, Phone, Mail, DollarSign, Clock, CheckCircle, XCircle, AlertCircle, User, Calendar, BookOpen, Loader2, Star, TrendingUp, CreditCard, Percent, Upload, X, Camera, Save, UserPlus, Eye, EyeOff, Download, MapPin, FileText } from 'lucide-react';
+import { Search, Filter, Edit, Trash2, Phone, Mail, DollarSign, Clock, CheckCircle, XCircle, AlertCircle, User, Calendar, BookOpen, Loader2, Star, TrendingUp, CreditCard, Percent, Upload, X, Camera, Save, UserPlus, Eye, EyeOff, Download, FileText } from 'lucide-react';
+import Image from "next/image";
 
 interface Student {
   _id: string;
@@ -661,14 +662,14 @@ const StudentManagementSystem = () => {
     return type === 'local' ? `₹${safeAmount.toLocaleString()}` : `$${safeAmount.toLocaleString()}`;
   };
 
-  const StudentCard = ({ student, index }: { student: Student; index: number }) => (
+  const StudentCard = ({ student }: { student: Student; index: number }) => (
     <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200/50 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 dark:bg-slate-800/90 dark:border-slate-700/50 p-6">
       <div className="flex flex-col space-y-4">
         {/* Header with profile */}
         <div className="flex items-center space-x-4">
           <div className="relative">
             {student.profilePicture ? (
-              <img
+              <Image
                 src={student.profilePicture}
                 alt={student.name}
                 className="w-16 h-16 rounded-full object-cover shadow-lg border-2 border-blue-200 dark:border-blue-600"
@@ -942,7 +943,7 @@ const StudentManagementSystem = () => {
                         <div className="flex items-center space-x-4">
                           <div className="relative">
                             {student.profilePicture ? (
-                              <img
+                              <Image
                                 src={student.profilePicture}
                                 alt={student.name}
                                 className="w-14 h-14 rounded-2xl object-cover shadow-lg border-2 border-blue-200 dark:border-blue-600"
@@ -1066,7 +1067,7 @@ const StudentManagementSystem = () => {
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-700/50 dark:to-slate-600/50 p-6 rounded-2xl border border-blue-200 dark:border-slate-600 text-center">
                   <div className="flex flex-col items-center space-y-4">
                     {selectedStudent.profilePicture ? (
-                      <img
+                      <Image
                         src={selectedStudent.profilePicture}
                         alt={selectedStudent.name}
                         className="w-32 h-32 rounded-full object-cover shadow-xl border-4 border-blue-200 dark:border-blue-600"
@@ -1328,7 +1329,7 @@ const StudentManagementSystem = () => {
                     <div className="relative">
                       {profilePreview || formData.profilePicture ? (
                         <div className="relative">
-                          <img
+                          <Image
                             src={profilePreview || formData.profilePicture}
                             alt="Profile Preview"
                             className="w-32 h-32 rounded-3xl object-cover shadow-xl border-4 border-purple-200 dark:border-purple-600"

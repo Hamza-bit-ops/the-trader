@@ -33,7 +33,9 @@ export default function ContactPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleInputChange = (e:any) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -41,7 +43,7 @@ export default function ContactPage() {
     }));
   };
 
-  const handleSubmit = (e:any) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle form submission here
     console.log('Form submitted:', formData);
@@ -126,7 +128,7 @@ export default function ContactPage() {
             
             <p className="text-lg md:text-xl mb-8 text-slate-300 max-w-2xl mx-auto leading-relaxed animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
               Have questions about our courses? Need guidance on your trading journey? 
-              We're here to help you succeed in forex trading.
+              We re here to help you succeed in forex trading.
             </p>
           </div>
         </div>
