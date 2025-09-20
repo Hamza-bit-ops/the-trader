@@ -41,6 +41,7 @@ export default function Navbar() {
           {[
             { href: "/", label: "Home" },
             { href: "/about", label: "About" },
+            { href: "/course", label: "Courses" },
             { href: "/contact", label: "Contact" },
             { href: "/students", label: "Admin Dashboard" },
           ].map((item, index) => (
