@@ -101,7 +101,7 @@ const StudentManagementSystem = () => {
       const discountPercent = Number(formData.discount);
       const discountAmount = (baseFee * discountPercent) / 100;
       const finalAmount = baseFee - discountAmount;
-      
+
       setFormData(prev => ({
         ...prev,
         discountAmount: discountAmount.toString(),
@@ -121,9 +121,9 @@ const StudentManagementSystem = () => {
     if (formData.finalAmount && formData.paidAmount) {
       const finalAmount = Number(formData.finalAmount);
       const paid = Number(formData.paidAmount);
-      
+
       if (paid >= finalAmount) {
-        setFormData(prev => ({ ...prev, status: 'paid' })); 
+        setFormData(prev => ({ ...prev, status: 'paid' }));
       } else if (paid > 0) {
         setFormData(prev => ({ ...prev, status: 'partial' }));
       } else {
@@ -242,7 +242,7 @@ const StudentManagementSystem = () => {
 
   const validateForm = () => {
     const errors = [];
-    
+
     if (!formData.name.trim()) errors.push("Student name is required");
     if (!formData.email.trim()) errors.push("Email is required");
     if (!formData.phone.trim()) errors.push("Phone number is required");
@@ -250,22 +250,22 @@ const StudentManagementSystem = () => {
     if (!formData.studentType) errors.push("Student type is required");
     if (!formData.course) errors.push("Course selection is required");
     if (!formData.enrollmentDate) errors.push("Enrollment date is required");
-    
+
     const paidAmount = Number(formData.paidAmount) || 0;
     const finalAmount = Number(formData.finalAmount);
     if (paidAmount > finalAmount) errors.push("Paid amount cannot exceed final amount");
-    
+
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (formData.email && !emailRegex.test(formData.email)) {
       errors.push("Please enter a valid email address");
     }
-    
+
     if (errors.length > 0) {
       alert("Please fix the following errors:\n\n" + errors.join("\n"));
       return false;
     }
-    
+
     return true;
   };
 
@@ -290,11 +290,11 @@ const StudentManagementSystem = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestData),
         });
-        
+
         if (res.ok) {
           const updatedStudent = await res.json();
-          setStudents(prev => 
-            prev.map(student => 
+          setStudents(prev =>
+            prev.map(student =>
               student._id === editingStudent._id ? updatedStudent : student
             )
           );
@@ -310,7 +310,7 @@ const StudentManagementSystem = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestData),
         });
-        
+
         if (res.ok) {
           const newStudent = await res.json();
           setStudents(prev => [newStudent, ...prev]);
@@ -322,7 +322,7 @@ const StudentManagementSystem = () => {
       }
 
       resetForm();
-      
+
     } catch (error) {
       console.error('Error submitting form:', error);
       alert(error instanceof Error ? error.message : 'An error occurred. Please try again.');
@@ -383,13 +383,13 @@ const StudentManagementSystem = () => {
     if (!window.confirm("Are you sure you want to delete this student? This action cannot be undone.")) {
       return;
     }
-    
+
     setLoading(true);
     try {
-      const res = await fetch(`/api/students/${studentId}`, { 
-        method: "DELETE" 
+      const res = await fetch(`/api/students/${studentId}`, {
+        method: "DELETE"
       });
-      
+
       if (res.ok) {
         setStudents(prev => prev.filter(student => student._id !== studentId));
         alert('Student deleted successfully!');
@@ -412,7 +412,7 @@ const StudentManagementSystem = () => {
     // Create PDF content
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
-    
+
     const formatCurrency = (amount: number, type: 'local' | 'foreigner') => {
       return type === 'local' ? `₹${amount.toLocaleString()}` : `${amount.toLocaleString()}`;
     };
@@ -605,10 +605,10 @@ const StudentManagementSystem = () => {
       </body>
       </html>
     `);
-    
+
     printWindow.document.close();
     printWindow.focus();
-    
+
     setTimeout(() => {
       printWindow.print();
     }, 250);
@@ -765,7 +765,7 @@ const StudentManagementSystem = () => {
           </div>
 
           {/* Enhanced Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 lg:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 lg:gap-6">
             {[
               { label: 'Total Students', value: stats.total, icon: User, color: 'from-blue-500 to-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20' },
               { label: 'Local Students', value: stats.locals, icon: User, color: 'from-green-500 to-green-600', bg: 'bg-green-50 dark:bg-green-900/20' },
@@ -946,8 +946,11 @@ const StudentManagementSystem = () => {
                               <Image
                                 src={student.profilePicture}
                                 alt={student.name}
+                                width={56}   // required
+                                height={56}  // required
                                 className="w-14 h-14 rounded-2xl object-cover shadow-lg border-2 border-blue-200 dark:border-blue-600"
                               />
+
                             ) : (
                               <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
                                 {student.name.charAt(0).toUpperCase()}
@@ -983,10 +986,10 @@ const StudentManagementSystem = () => {
                         </div>
                       </td>
                       <td className="py-6 px-6 text-sm text-gray-600 dark:text-gray-300 font-medium">
-                        {new Date(student.enrollmentDate).toLocaleDateString('en-GB', { 
-                          day: '2-digit', 
-                          month: 'short', 
-                          year: 'numeric' 
+                        {new Date(student.enrollmentDate).toLocaleDateString('en-GB', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric'
                         })}
                       </td>
                       <td className="py-6 px-6">
@@ -1070,8 +1073,11 @@ const StudentManagementSystem = () => {
                       <Image
                         src={selectedStudent.profilePicture}
                         alt={selectedStudent.name}
-                        className="w-32 h-32 rounded-full object-cover shadow-xl border-4 border-blue-200 dark:border-blue-600"
+                        width={56}   // required
+                        height={56}  // required
+                        className="w-14 h-14 rounded-2xl object-cover shadow-lg border-2 border-blue-200 dark:border-blue-600"
                       />
+
                     ) : (
                       <div className="w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-5xl shadow-xl">
                         {selectedStudent.name.charAt(0).toUpperCase()}
@@ -1139,10 +1145,10 @@ const StudentManagementSystem = () => {
                         <span>Enrollment Date</span>
                       </div>
                       <div className="text-gray-800 dark:text-white font-semibold">
-                        {new Date(selectedStudent.enrollmentDate).toLocaleDateString('en-GB', { 
-                          day: '2-digit', 
-                          month: 'long', 
-                          year: 'numeric' 
+                        {new Date(selectedStudent.enrollmentDate).toLocaleDateString('en-GB', {
+                          day: '2-digit',
+                          month: 'long',
+                          year: 'numeric'
                         })}
                       </div>
                     </div>
@@ -1157,7 +1163,7 @@ const StudentManagementSystem = () => {
                     </div>
                     <span>Fee Structure & Payment Details</span>
                   </h3>
-                  
+
                   <div className="grid md:grid-cols-2 gap-6 mb-6">
                     <div className="space-y-4">
                       <div className="bg-white/60 dark:bg-slate-800/60 p-5 rounded-xl border border-amber-100 dark:border-slate-600">
@@ -1222,19 +1228,18 @@ const StudentManagementSystem = () => {
                   <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-slate-600/50 dark:to-slate-700/50 p-5 rounded-xl border border-blue-200 dark:border-slate-600">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <div className={`p-3 rounded-full ${
-                          selectedStudent.status === 'paid' ? 'bg-emerald-100 dark:bg-emerald-900/20' :
+                        <div className={`p-3 rounded-full ${selectedStudent.status === 'paid' ? 'bg-emerald-100 dark:bg-emerald-900/20' :
                           selectedStudent.status === 'partial' ? 'bg-amber-100 dark:bg-amber-900/20' :
-                          'bg-red-100 dark:bg-red-900/20'
-                        }`}>
+                            'bg-red-100 dark:bg-red-900/20'
+                          }`}>
                           {getStatusIcon(selectedStudent.status)}
                         </div>
                         <div>
                           <div className="text-lg font-bold text-gray-800 dark:text-white">Payment Status</div>
                           <div className="text-gray-600 dark:text-gray-400">
                             {selectedStudent.status === 'paid' ? 'All payments completed' :
-                             selectedStudent.status === 'partial' ? 'Partial payment made' :
-                             'Payment pending'}
+                              selectedStudent.status === 'partial' ? 'Partial payment made' :
+                                'Payment pending'}
                           </div>
                         </div>
                       </div>
@@ -1323,7 +1328,7 @@ const StudentManagementSystem = () => {
                     </div>
                     <span>Profile Picture</span>
                   </h3>
-                  
+
                   <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8">
                     {/* Profile Picture Preview */}
                     <div className="relative">
@@ -1332,6 +1337,8 @@ const StudentManagementSystem = () => {
                           <Image
                             src={profilePreview || formData.profilePicture}
                             alt="Profile Preview"
+                              width={56}   // required
+  height={56}  // required
                             className="w-32 h-32 rounded-3xl object-cover shadow-xl border-4 border-purple-200 dark:border-purple-600"
                           />
                           <button
@@ -1458,11 +1465,10 @@ const StudentManagementSystem = () => {
                         {Object.entries(feeStructure[formData.studentType]).map(([course, fee]) => (
                           <div
                             key={course}
-                            className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                              formData.course === course
-                                ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-600'
-                                : 'border-gray-200 bg-gray-50 dark:bg-slate-700 dark:border-slate-600'
-                            }`}
+                            className={`p-4 rounded-xl border-2 transition-all duration-300 ${formData.course === course
+                              ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-600'
+                              : 'border-gray-200 bg-gray-50 dark:bg-slate-700 dark:border-slate-600'
+                              }`}
                           >
                             <div className="text-center">
                               <div className="font-bold text-gray-800 dark:text-white capitalize mb-2">{course}</div>
@@ -1569,7 +1575,7 @@ const StudentManagementSystem = () => {
                     <div>
                       <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
                         Base Fee ({formData.studentType === 'local' ? '₹' : ''
-                  })
+                        })
                       </label>
                       <input
                         type="number"
@@ -1599,7 +1605,7 @@ const StudentManagementSystem = () => {
                     <div>
                       <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
                         Final Amount ({formData.studentType === 'local' ? '₹' : ''
-                  })
+                        })
                       </label>
                       <input
                         type="number"
@@ -1611,8 +1617,8 @@ const StudentManagementSystem = () => {
 
                     <div>
                       <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
-                        Amount Paid ({formData.studentType === 'local' ? '₹' :' '
-                  })
+                        Amount Paid ({formData.studentType === 'local' ? '₹' : ' '
+                        })
                       </label>
                       <input
                         type="number"

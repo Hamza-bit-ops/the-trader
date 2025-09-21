@@ -97,7 +97,7 @@ export default function RootLayout({
                   {[
                     { label: "Home", href: "/" },
                     { label: "About Us", href: "/about" },
-                    { label: "Courses", href: "/courses" },
+                    { label: "Courses", href: "/course" },
                     { label: "Contact", href: "/contact" },
                   ].map((link) => (
                     <li key={link.href}>
@@ -118,7 +118,7 @@ export default function RootLayout({
                 <ul className="space-y-2 text-sm text-slate-400">
                   <li>Email: th3trad3rsofficial@gmail.com</li>
                   <li>Phone: +92 343 1304090</li>
-                  <li>Address: Housing Two Layyah</li>
+                  <li>Address: Layyah</li>
                 </ul>
               </div>
             </div>

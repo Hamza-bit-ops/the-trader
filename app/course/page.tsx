@@ -395,7 +395,7 @@ export default function CoursesPage() {
               </Link>
               
               <div className="text-slate-400 text-sm">
-                Or call us at: <span className="text-cyan-400 font-semibold">+92 XXX XXXXXXX</span>
+                Or call us at: <span className="text-cyan-400 font-semibold">+92 343 1304090</span>
               </div>
             </div>
           </div>

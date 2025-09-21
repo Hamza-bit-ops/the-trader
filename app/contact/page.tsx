@@ -46,7 +46,6 @@ export default function ContactPage() {
   
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle form submission here
     console.log('Form submitted:', formData);
     // You can add actual form submission logic here
     alert('Thank you for your message! We will get back to you soon.');
@@ -273,7 +272,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <div className="text-slate-300 text-sm">Phone</div>
-                      <div className="text-white font-semibold">+92 XXX XXXXXXX</div>
+                      <div className="text-white font-semibold">+92 343 1304090</div>
                     </div>
                   </div>
 
@@ -285,7 +284,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <div className="text-slate-300 text-sm">Email</div>
-                      <div className="text-white font-semibold">info@th3trad3rs.com</div>
+                      <div className="text-white font-semibold">th3trad3rsofficial@gmail.com</div>
                     </div>
                   </div>
 
@@ -298,7 +297,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <div className="text-slate-300 text-sm">Location</div>
-                      <div className="text-white font-semibold">Chichawatni, Punjab, Pakistan</div>
+                      <div className="text-white font-semibold">Layyah</div>
                     </div>
                   </div>
 
