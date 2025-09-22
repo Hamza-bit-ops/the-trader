@@ -258,6 +258,9 @@ tr:hover {
   background: rgba(245, 158, 11, 0.05);
 }
 
+
+
+
 /* Responsive utilities */
 @media (max-width: 640px) {
   .container {

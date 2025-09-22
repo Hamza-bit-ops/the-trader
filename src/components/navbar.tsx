@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,16 +26,17 @@ export default function Navbar() {
     }`}>
       <div className="container mx-auto flex justify-between items-center px-6 py-4">
         {/* Logo with animation */}
-        <Link href="/" className="group">
-          <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300 shadow-lg group-hover:shadow-cyan-500/25">
-              <span className="text-white font-bold text-lg">FX</span>
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
-              Th3 Trad3rs
-            </span>
-          </div>
-        </Link>
+       <Link href="/" className="group">
+  <div className="flex items-center space-x-2">
+    <div className="w-10 h-10 bg-gradient-to-br flex items-center justify-center transform   transition-transform duration-300">
+      <Image src="/logo.jpg" alt="Logo" width={32} height={32} className="rounded-full" />
+    </div>
+    <span className="text-2xl font-bold text-white">
+      Th3 Trad3rs
+    </span>
+  </div>
+</Link>
+
 
         {/* Desktop Menu */}
         <ul className="hidden md:flex space-x-8 font-medium">

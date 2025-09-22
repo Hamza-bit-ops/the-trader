@@ -41,7 +41,6 @@ const StudentManagementSystem = () => {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -59,7 +58,6 @@ const StudentManagementSystem = () => {
     profilePicture: '',
     notes: ''
   });
-
   const feeStructure = useMemo(
     () => ({
       local: {
@@ -75,62 +73,47 @@ const StudentManagementSystem = () => {
     }),
     []
   );
-
   // Load students data
   useEffect(() => {
     loadStudents();
   }, []);
 
-  // Calculate fees when student type or course changes
+
   useEffect(() => {
-    if (formData.studentType && formData.course) {
-      const baseFee = feeStructure[formData.studentType][formData.course];
-      setFormData((prev) => ({
-        ...prev,
-        feeAmount: baseFee.toString(),
-        discountAmount: "",
-        finalAmount: baseFee.toString(),
-      }));
+    const studentType = formData.studentType;
+    const course = formData.course;
+
+    if (!studentType || !course) return;
+
+    const baseFee = feeStructure[studentType][course] || 0;
+    const discountPercent = Number(formData.discount) || 0;
+    const discountAmount = (baseFee * discountPercent) / 100;
+    const finalAmount = baseFee - discountAmount;
+
+    const paidAmount = Number(formData.paidAmount) || 0;
+
+    let status = "pending";
+    if (paidAmount === finalAmount && finalAmount > 0) {
+      status = "paid";
+    } else if (paidAmount > 0 && paidAmount < finalAmount) {
+      status = "partial";
     }
-  }, [formData.studentType, formData.course, feeStructure]);
 
-  // Calculate discount and final amount
-  useEffect(() => {
-    if (formData.feeAmount && formData.discount) {
-      const baseFee = Number(formData.feeAmount);
-      const discountPercent = Number(formData.discount);
-      const discountAmount = (baseFee * discountPercent) / 100;
-      const finalAmount = baseFee - discountAmount;
-
-      setFormData(prev => ({
-        ...prev,
-        discountAmount: discountAmount.toString(),
-        finalAmount: finalAmount.toString()
-      }));
-    } else if (formData.feeAmount) {
-      setFormData(prev => ({
-        ...prev,
-        discountAmount: '0',
-        finalAmount: formData.feeAmount
-      }));
+    // Force status = paid agar editing hai aur record already paid tha
+    if (editingStudent && editingStudent.status === "paid" && paidAmount === finalAmount) {
+      status = "paid";
     }
-  }, [formData.feeAmount, formData.discount]);
 
-  // Auto-calculate payment status based on paid amount
-  useEffect(() => {
-    if (formData.finalAmount && formData.paidAmount) {
-      const finalAmount = Number(formData.finalAmount);
-      const paid = Number(formData.paidAmount);
+    setFormData((prev) => ({
+      ...prev,
+      feeAmount: baseFee.toString(),
+      discountAmount: discountAmount.toString(),
+      finalAmount: finalAmount.toString(),
+      status,
+    }));
+  }, [formData.studentType, formData.course, formData.discount, formData.paidAmount, feeStructure, editingStudent]);
 
-      if (paid >= finalAmount) {
-        setFormData(prev => ({ ...prev, status: 'paid' }));
-      } else if (paid > 0) {
-        setFormData(prev => ({ ...prev, status: 'partial' }));
-      } else {
-        setFormData(prev => ({ ...prev, status: 'pending' }));
-      }
-    }
-  }, [formData.finalAmount, formData.paidAmount]);
+
 
   const loadStudents = async () => {
     setLoading(true);
@@ -169,7 +152,7 @@ const StudentManagementSystem = () => {
             studentType: 'local',
             course: 'advance',
             feeAmount: 30000,
-            paidAmount: 27000,
+            paidAmount: 27000, // Corrected paid amount
             discount: 10,
             discountAmount: 3000,
             finalAmount: 27000,
@@ -200,11 +183,10 @@ const StudentManagementSystem = () => {
       }
     } catch (error) {
       console.error('Error loading students:', error);
-      setStudents([]);
+      setStudents([]); // Set to empty array on error
     }
     setLoading(false);
   };
-
   // Handle profile picture upload
   const handleProfilePictureUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -230,7 +212,6 @@ const StudentManagementSystem = () => {
     };
     reader.readAsDataURL(file);
   };
-
   // Remove profile picture
   const removeProfilePicture = () => {
     setFormData(prev => ({ ...prev, profilePicture: '' }));
@@ -239,7 +220,6 @@ const StudentManagementSystem = () => {
       fileInputRef.current.value = '';
     }
   };
-
   const validateForm = () => {
     const errors = [];
 
@@ -250,11 +230,9 @@ const StudentManagementSystem = () => {
     if (!formData.studentType) errors.push("Student type is required");
     if (!formData.course) errors.push("Course selection is required");
     if (!formData.enrollmentDate) errors.push("Enrollment date is required");
-
     const paidAmount = Number(formData.paidAmount) || 0;
     const finalAmount = Number(formData.finalAmount);
-    if (paidAmount > finalAmount) errors.push("Paid amount cannot exceed final amount");
-
+    if (paidAmount > finalAmount) errors.push("Paid amount cannot exceed the final amount");
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (formData.email && !emailRegex.test(formData.email)) {
@@ -271,18 +249,16 @@ const StudentManagementSystem = () => {
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-
     setSubmitLoading(true);
     try {
       const requestData = {
         ...formData,
-        feeAmount: Number(formData.feeAmount),
+        feeAmount: Number(formData.feeAmount) || 0,
         paidAmount: Number(formData.paidAmount) || 0,
         discount: Number(formData.discount) || 0,
         discountAmount: Number(formData.discountAmount) || 0,
-        finalAmount: Number(formData.finalAmount),
+        finalAmount: Number(formData.finalAmount) || 0,
       };
-
       if (editingStudent) {
         // Update existing student
         const res = await fetch(`/api/students/${editingStudent._id}`, {
@@ -290,7 +266,6 @@ const StudentManagementSystem = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestData),
         });
-
         if (res.ok) {
           const updatedStudent = await res.json();
           setStudents(prev =>
@@ -310,7 +285,6 @@ const StudentManagementSystem = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestData),
         });
-
         if (res.ok) {
           const newStudent = await res.json();
           setStudents(prev => [newStudent, ...prev]);
@@ -322,14 +296,12 @@ const StudentManagementSystem = () => {
       }
 
       resetForm();
-
     } catch (error) {
       console.error('Error submitting form:', error);
       alert(error instanceof Error ? error.message : 'An error occurred. Please try again.');
     }
     setSubmitLoading(false);
   };
-
   const resetForm = () => {
     setShowForm(false);
     setEditingStudent(null);
@@ -355,7 +327,6 @@ const StudentManagementSystem = () => {
       fileInputRef.current.value = '';
     }
   };
-
   const handleEdit = (student: Student) => {
     setFormData({
       name: student.name,
@@ -389,7 +360,6 @@ const StudentManagementSystem = () => {
       const res = await fetch(`/api/students/${studentId}`, {
         method: "DELETE"
       });
-
       if (res.ok) {
         setStudents(prev => prev.filter(student => student._id !== studentId));
         alert('Student deleted successfully!');
@@ -402,19 +372,16 @@ const StudentManagementSystem = () => {
     }
     setLoading(false);
   };
-
   const handleViewDetails = (student: Student) => {
     setSelectedStudent(student);
     setShowDetailModal(true);
   };
-
   const downloadPDF = (student: Student) => {
-    // Create PDF content
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
-
     const formatCurrency = (amount: number, type: 'local' | 'foreigner') => {
-      return type === 'local' ? `₹${amount.toLocaleString()}` : `${amount.toLocaleString()}`;
+      return type === 'local' ?
+        `PKR ${amount.toLocaleString()}` : `$${amount.toLocaleString()}`;
     };
 
     printWindow.document.write(`
@@ -424,93 +391,24 @@ const StudentManagementSystem = () => {
         <title>Student Details - ${student.name}</title>
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { 
-            font-family: 'Arial', sans-serif; 
-            background: #0f172a;
-            padding: 20px;
-            color: #f1f5f9;
-            font-size: 14px;
-          }
-          .container { 
-            max-width: 600px; 
-            margin: 0 auto; 
-            background: linear-gradient(135deg, #1e293b, #334155); 
-            border-radius: 15px; 
-            border: 2px solid #f59e0b;
-            overflow: hidden;
-          }
-          .header { 
-            background: linear-gradient(135deg, #f59e0b, #eab308); 
-            color: #0f172a; 
-            padding: 25px; 
-            text-align: center; 
-          }
+          body { font-family: 'Arial', sans-serif; background: #0f172a; padding: 20px; color: #f1f5f9; font-size: 14px; }
+          .container { max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1e293b, #334155); border-radius: 15px; border: 2px solid #f59e0b; overflow: hidden; }
+          .header { background: linear-gradient(135deg, #f59e0b, #eab308); color: #0f172a; padding: 25px; text-align: center; }
           .header h1 { font-size: 1.8em; margin-bottom: 5px; font-weight: bold; }
           .header p { font-size: 1em; opacity: 0.8; }
           .content { padding: 25px; }
-          .student-info { 
-            display: flex; 
-            align-items: center; 
-            margin-bottom: 20px; 
-            padding-bottom: 20px; 
-            border-bottom: 2px solid #374151;
-          }
-          .profile { 
-            width: 80px; 
-            height: 80px; 
-            border-radius: 50%; 
-            background: linear-gradient(135deg, #f59e0b, #eab308); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: #0f172a; 
-            font-size: 2em; 
-            font-weight: bold; 
-            margin-right: 20px;
-          }
+          .student-info { display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid #374151; }
+          .profile { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #eab308); display: flex; align-items: center; justify-content: center; color: #0f172a; font-size: 2em; font-weight: bold; margin-right: 20px; overflow: hidden; }
           .student-details h2 { font-size: 1.4em; margin-bottom: 5px; color: #f59e0b; }
           .student-details p { margin: 2px 0; color: #cbd5e1; }
-          .info-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 15px; 
-            margin-bottom: 20px;
-          }
-          .info-item { 
-            background: #374151; 
-            padding: 12px; 
-            border-radius: 8px; 
-            border-left: 3px solid #f59e0b;
-          }
+          .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+          .info-item { background: #374151; padding: 12px; border-radius: 8px; border-left: 3px solid #f59e0b; }
           .info-label { font-weight: bold; color: #f59e0b; font-size: 0.9em; }
           .info-value { color: #f1f5f9; margin-top: 3px; }
-          .payment-summary { 
-            background: #374151; 
-            padding: 15px; 
-            border-radius: 8px; 
-            border: 1px solid #f59e0b;
-          }
-          .payment-row { 
-            display: flex; 
-            justify-content: space-between; 
-            margin-bottom: 8px; 
-          }
-          .payment-total { 
-            font-weight: bold; 
-            font-size: 1.1em; 
-            border-top: 1px solid #f59e0b; 
-            padding-top: 8px; 
-            color: #f59e0b;
-          }
-          .status-badge { 
-            display: inline-block; 
-            padding: 4px 12px; 
-            border-radius: 15px; 
-            font-size: 0.8em; 
-            font-weight: bold; 
-            text-transform: capitalize;
-            margin-left: 10px;
-          }
+          .payment-summary { background: #374151; padding: 15px; border-radius: 8px; border: 1px solid #f59e0b; }
+          .payment-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+          .payment-total { font-weight: bold; font-size: 1.1em; border-top: 1px solid #f59e0b; padding-top: 8px; color: #f59e0b; }
+          .status-badge { display: inline-block; padding: 4px 12px; border-radius: 15px; font-size: 0.8em; font-weight: bold; text-transform: capitalize; margin-left: 10px; }
           .status-paid { background: #059669; color: white; }
           .status-partial { background: #d97706; color: white; }
           .status-pending { background: #dc2626; color: white; }
@@ -522,30 +420,45 @@ const StudentManagementSystem = () => {
             .info-item { background: #f8f9fa; color: black; }
             .payment-summary { background: #f8f9fa; color: black; }
           }
+
+        .stamp-logo {
+  width: 170px;       
+  height: 170px;
+  border-radius: 50%;   /* circle */
+  object-fit: cover;    /* image crop ho kar fit ho jaye */
+  margin-top: 15px;
+  display: block;
+  margin-left: auto;    /* right side align */
+  opacity: 0.8;         /* thoda transparent */
+  transform: rotate(-30deg);
+}
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>Trading Academy</h1>
+            <h1>Th3 Trad3rs Consultancy</h1>
             <p>Student Management System</p>
           </div>
-          
           <div class="content">
             <div class="student-info">
               <div class="profile">
-                ${student.profilePicture ? `<img src="${student.profilePicture}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />` : student.name.charAt(0).toUpperCase()}
+                ${student.profilePicture ?
+        `<img src="${student.profilePicture}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />`
+        : student.name.charAt(0).toUpperCase()}
               </div>
               <div class="student-details">
                 <h2>${student.name}</h2>
                 <p><strong>Email:</strong> ${student.email}</p>
                 <p><strong>Phone:</strong> ${student.phone}</p>
                 <p><strong>CNIC:</strong> ${student.cnic}
-                  <span class="status-badge status-${student.status}">${student.status}</span>
+                <p><strong >Status:</strong> <span class="status-badge status-${student.status}">${student.status}</span>
                 </p>
-              </div>
-            </div>
 
+             
+              </div>
+                  <img src="stamp-removebg-preview.png"   class="stamp-logo">
+            </div>
             <div class="info-grid">
               <div class="info-item">
                 <div class="info-label">Course</div>
@@ -561,9 +474,11 @@ const StudentManagementSystem = () => {
               </div>
               <div class="info-item">
                 <div class="info-label">Payment Progress</div>
-                <div class="info-value">${Math.round((student.paidAmount / student.finalAmount) * 100)}%</div>
+                <div class="info-value">${student.finalAmount > 0 ? Math.round((student.paidAmount / student.finalAmount) * 100) : 0}%</div>
               </div>
             </div>
+               
+
 
             <div class="payment-summary">
               <div class="payment-row">
@@ -589,14 +504,12 @@ const StudentManagementSystem = () => {
                 <span style="color: #dc2626;">${formatCurrency(student.finalAmount - student.paidAmount, student.studentType)}</span>
               </div>
             </div>
-
             ${student.notes ? `
             <div style="margin-top: 15px; padding: 12px; background: #374151; border-radius: 8px; border-left: 3px solid #f59e0b;">
               <div style="font-weight: bold; color: #f59e0b; margin-bottom: 5px;">Notes:</div>
               <div style="color: #cbd5e1; font-size: 0.9em;">${student.notes}</div>
             </div>
             ` : ''}
-
             <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #374151; color: #94a3b8; font-size: 0.8em;">
               Generated on ${new Date().toLocaleDateString('en-GB')} at ${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
             </div>
@@ -605,7 +518,6 @@ const StudentManagementSystem = () => {
       </body>
       </html>
     `);
-
     printWindow.document.close();
     printWindow.focus();
 
@@ -613,7 +525,6 @@ const StudentManagementSystem = () => {
       printWindow.print();
     }, 250);
   };
-
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'paid': return 'bg-emerald-50 text-emerald-800 border border-emerald-300 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-700';
@@ -633,35 +544,46 @@ const StudentManagementSystem = () => {
       default: return <Clock className="w-4 h-4" />;
     }
   };
-
-  const filteredStudents = students.filter(student => {
-    const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredStudents = useMemo(() => students.filter(student => {
+    const searchTermLower = searchTerm.toLowerCase();
+    const matchesSearch = student.name.toLowerCase().includes(searchTermLower) ||
+      student.email.toLowerCase().includes(searchTermLower) ||
       student.phone.includes(searchTerm) ||
-      student.cnic.includes(searchTerm);
+      student.cnic.toLowerCase().includes(searchTermLower);
     const matchesStatus = statusFilter === 'all' || student.status === statusFilter;
     const matchesCourse = courseFilter === 'all' || student.course === courseFilter;
     const matchesType = studentTypeFilter === 'all' || student.studentType === studentTypeFilter;
     return matchesSearch && matchesStatus && matchesCourse && matchesType;
-  });
+  }), [students, searchTerm, statusFilter, courseFilter, studentTypeFilter]);
+  const stats = useMemo(() => {
+    const localStudents = students.filter(s => s.studentType === 'local');
+    const foreignStudents = students.filter(s => s.studentType === 'foreigner');
 
-  const stats = {
-    total: students.length,
-    paid: students.filter(s => s.status === 'paid').length,
-    pending: students.filter(s => s.status === 'pending').length,
-    partial: students.filter(s => s.status === 'partial').length,
-    overdue: students.filter(s => s.status === 'overdue').length,
-    totalRevenue: students.reduce((sum, s) => sum + (s.paidAmount || 0), 0),
-    pendingRevenue: students.reduce((sum, s) => sum + ((s.finalAmount || 0) - (s.paidAmount || 0)), 0),
-    locals: students.filter(s => s.studentType === 'local').length,
-    foreigners: students.filter(s => s.studentType === 'foreigner').length
-  };
+    const localRevenue = localStudents.reduce((sum, s) => sum + (s.paidAmount || 0), 0);
+    const pendingLocalRevenue = localStudents.reduce((sum, s) => sum + Math.max(0, (s.finalAmount || 0) - (s.paidAmount || 0)), 0);
+
+    const foreignerRevenue = foreignStudents.reduce((sum, s) => sum + (s.paidAmount || 0), 0);
+    const pendingForeignerRevenue = foreignStudents.reduce((sum, s) => sum + Math.max(0, (s.finalAmount || 0) - (s.paidAmount || 0)), 0);
+
+
+    return {
+      total: students.length,
+      paid: students.filter(s => s.status === 'paid').length,
+      pending: students.filter(s => s.status === 'pending').length,
+      partial: students.filter(s => s.status === 'partial').length,
+      locals: localStudents.length,
+      foreigners: foreignStudents.length,
+      localRevenue,
+      pendingLocalRevenue,
+      foreignerRevenue,
+      pendingForeignerRevenue
+    };
+  }, [students]);
 
   const formatCurrency = (amount: number | undefined | null, type: 'local' | 'foreigner') => {
     const safeAmount = amount || 0;
-    return type === 'local' ? `₹${safeAmount.toLocaleString()}` : `$${safeAmount.toLocaleString()}`;
+    return type === 'local' ? `PKR ${safeAmount.toLocaleString()}` : `$${safeAmount.toLocaleString()}`;
   };
-
   const StudentCard = ({ student }: { student: Student; index: number }) => (
     <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200/50 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 dark:bg-slate-800/90 dark:border-slate-700/50 p-6">
       <div className="flex flex-col space-y-4">
@@ -672,6 +594,8 @@ const StudentManagementSystem = () => {
               <Image
                 src={student.profilePicture}
                 alt={student.name}
+                width={64}
+                height={64}
                 className="w-16 h-16 rounded-full object-cover shadow-lg border-2 border-blue-200 dark:border-blue-600"
               />
             ) : (
@@ -696,7 +620,8 @@ const StudentManagementSystem = () => {
           <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium dark:bg-blue-900/20 dark:text-blue-300 capitalize">
             {student.course}
           </span>
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${student.studentType === 'local' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' : 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300'}`}>
+          <span className={`px-3 py-1 rounded-full text-sm font-medium ${student.studentType === 'local' ?
+            'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' : 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300'}`}>
             {student.studentType === 'local' ? 'Local' : 'International'}
           </span>
         </div>
@@ -714,7 +639,7 @@ const StudentManagementSystem = () => {
             className="flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100 px-4 py-2 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
           >
             <Eye className="w-4 h-4" />
-            <span>View Details</span>
+            <span>View</span>
           </button>
           <button
             onClick={() => handleEdit(student)}
@@ -734,7 +659,6 @@ const StudentManagementSystem = () => {
       </div>
     </div>
   );
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 lg:p-6 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <div className="max-w-7xl mx-auto">
@@ -767,20 +691,20 @@ const StudentManagementSystem = () => {
           {/* Enhanced Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 lg:gap-6">
             {[
-              { label: 'Total Students', value: stats.total, icon: User, color: 'from-blue-500 to-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-              { label: 'Local Students', value: stats.locals, icon: User, color: 'from-green-500 to-green-600', bg: 'bg-green-50 dark:bg-green-900/20' },
-              { label: 'International', value: stats.foreigners, icon: User, color: 'from-purple-500 to-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/20' },
-              { label: 'Paid', value: stats.paid, icon: CheckCircle, color: 'from-emerald-500 to-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
-              { label: 'Pending', value: stats.pending, icon: AlertCircle, color: 'from-slate-500 to-slate-600', bg: 'bg-slate-50 dark:bg-slate-900/20' },
-              { label: 'Partial', value: stats.partial, icon: Clock, color: 'from-amber-500 to-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/20' },
-              { label: 'Total Revenue', value: `₹${stats.totalRevenue.toLocaleString()}`, icon: TrendingUp, color: 'from-cyan-500 to-cyan-600', bg: 'bg-cyan-50 dark:bg-cyan-900/20' },
-              { label: 'Pending Revenue', value: `₹${stats.pendingRevenue.toLocaleString()}`, icon: DollarSign, color: 'from-red-500 to-red-600', bg: 'bg-red-50 dark:bg-red-900/20' }
+              { label: 'Total Students', value: stats.total, icon: User, color: 'from-blue-500 to-blue-600' },
+              { label: 'Paid', value: stats.paid, icon: CheckCircle, color: 'from-emerald-500 to-emerald-600' },
+              { label: 'Pending', value: stats.pending, icon: AlertCircle, color: 'from-slate-500 to-slate-600' },
+              { label: 'Partial', value: stats.partial, icon: Clock, color: 'from-amber-500 to-amber-600' },
+              { label: 'Local Revenue (PKR )', value: `PKR ${stats.localRevenue.toLocaleString()}`, icon: TrendingUp, color: 'from-green-500 to-green-600' },
+              { label: 'Pending (PKR )', value: `PKR ${stats.pendingLocalRevenue.toLocaleString()}`, icon: DollarSign, color: 'from-orange-500 to-orange-600' },
+              { label: 'Intl Revenue ($)', value: `$${stats.foreignerRevenue.toLocaleString()}`, icon: TrendingUp, color: 'from-purple-500 to-purple-600' },
+              { label: 'Pending ($)', value: `$${stats.pendingForeignerRevenue.toLocaleString()}`, icon: DollarSign, color: 'from-red-500 to-red-600' }
             ].map((stat, index) => {
               const IconComponent = stat.icon;
               return (
                 <div
                   key={stat.label}
-                  className={`${stat.bg} p-4 lg:p-6 rounded-2xl border border-slate-200/50 hover:shadow-lg transition-all duration-500 transform hover:-translate-y-1 hover:scale-105 dark:border-slate-700/30`}
+                  className={`bg-white/50 dark:bg-slate-800/50 p-4 lg:p-6 rounded-2xl border border-slate-200/50 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 dark:border-slate-700/30`}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className={`w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center mb-3 lg:mb-4 shadow-md`}>
@@ -873,165 +797,170 @@ const StudentManagementSystem = () => {
 
         {/* Students Display */}
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-slate-200/50 overflow-hidden dark:bg-slate-800/90 dark:border-slate-700/50">
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-              <span className="ml-3 text-gray-600 dark:text-gray-300 font-medium">Loading students...</span>
-            </div>
-          ) : viewMode === 'cards' ? (
-            <div className="p-6">
-              {filteredStudents.length === 0 ? (
-                <div className="text-center py-20">
-                  <div className="text-8xl mb-6">🔍</div>
-                  <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">No students found</h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-lg">Try adjusting your search or filter criteria</p>
+          {loading ?
+            (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                <span className="ml-3 text-gray-600 dark:text-gray-300 font-medium">Loading students...</span>
+              </div>
+            ) : viewMode === 'cards' ?
+              (
+                <div className="p-6">
+                  {filteredStudents.length === 0 ? (
+                    <div className="text-center py-20">
+                      <div className="text-8xl mb-6">🔍</div>
+                      <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">No students found</h3>
+                      <p className="text-gray-600 dark:text-gray-300 text-lg">Try adjusting your search or filter criteria</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredStudents.map((student, index) => (
+                        <StudentCard key={student._id} student={student} index={index} />
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredStudents.map((student, index) => (
-                    <StudentCard key={student._id} student={student} index={index} />
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gradient-to-r from-slate-50/80 via-blue-50/80 to-indigo-50/80 border-b-2 border-slate-200 dark:from-slate-700/50 dark:to-slate-600/50 dark:border-slate-600/50">
-                  <tr>
-                    <th className="text-left py-6 px-6 font-bold text-gray-700 dark:text-gray-200">
-                      <div className="flex items-center space-x-2">
-                        <User className="w-5 h-5 text-amber-600" />
-                        <span>Student</span>
-                      </div>
-                    </th>
-                    <th className="text-left py-6 px-6 font-bold text-gray-700 dark:text-gray-200">
-                      <div className="flex items-center space-x-2">
-                        <CreditCard className="w-5 h-5 text-amber-600" />
-                        <span>CNIC/Passport</span>
-                      </div>
-                    </th>
-                    <th className="text-left py-6 px-6 font-bold text-gray-700 dark:text-gray-200">
-                      <div className="flex items-center space-x-2">
-                        <BookOpen className="w-5 h-5 text-amber-600" />
-                        <span>Course</span>
-                      </div>
-                    </th>
-                    <th className="text-left py-6 px-6 font-bold text-gray-700 dark:text-gray-200">
-                      <div className="flex items-center space-x-2">
-                        <User className="w-5 h-5 text-amber-600" />
-                        <span>Type</span>
-                      </div>
-                    </th>
-                    <th className="text-left py-6 px-6 font-bold text-gray-700 dark:text-gray-200">
-                      <div className="flex items-center space-x-2">
-                        <Calendar className="w-5 h-5 text-amber-600" />
-                        <span>Enrollment</span>
-                      </div>
-                    </th>
-                    <th className="text-left py-6 px-6 font-bold text-gray-700 dark:text-gray-200">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredStudents.map((student, index) => (
-                    <tr
-                      key={student._id}
-                      className="border-b border-slate-100/50 hover:bg-gradient-to-r hover:from-slate-50/30 hover:to-blue-50/30 transition-all duration-300 dark:border-slate-700/50 dark:hover:from-slate-700/30 dark:hover:to-slate-600/30"
-                      style={{ animationDelay: `${index * 100}ms` }}
-                    >
-                      <td className="py-6 px-6">
-                        <div className="flex items-center space-x-4">
-                          <div className="relative">
-                            {student.profilePicture ? (
-                              <Image
-                                src={student.profilePicture}
-                                alt={student.name}
-                                width={56}   // required
-                                height={56}  // required
-                                className="w-14 h-14 rounded-2xl object-cover shadow-lg border-2 border-blue-200 dark:border-blue-600"
-                              />
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gradient-to-r from-slate-50/80 via-blue-50/80 to-indigo-50/80 border-b-2 border-slate-200 dark:from-slate-700/50 dark:to-slate-600/50 dark:border-slate-600/50">
+                      <tr>
+                        <th className="text-left py-6 px-6 font-bold text-gray-700 dark:text-gray-200">
+                          <div className="flex items-center space-x-2">
+                            <User className="w-5 h-5 text-amber-600" />
+                            <span>Student</span>
+                          </div>
+                        </th>
+                        <th className="text-left py-6 px-6 font-bold text-gray-700 dark:text-gray-200">
+                          <div className="flex items-center space-x-2">
+                            <CreditCard className="w-5 h-5 text-amber-600" />
+                            <span>CNIC/Passport</span>
+                          </div>
+                        </th>
+                        <th className="text-left py-6 px-6 font-bold text-gray-700 dark:text-gray-200">
+                          <div className="flex items-center space-x-2">
+                            <BookOpen className="w-5 h-5 text-amber-600" />
+                            <span>Course</span>
+                          </div>
+                        </th>
+                        <th className="text-left py-6 px-6 font-bold text-gray-700 dark:text-gray-200">
+                          <div className="flex items-center space-x-2">
+                            <User className="w-5 h-5 text-amber-600" />
+                            <span>Type</span>
+                          </div>
+                        </th>
+                        <th className="text-left py-6 px-6 font-bold text-gray-700 dark:text-gray-200">
+                          <div className="flex items-center space-x-2">
+                            <Calendar className="w-5 h-5 text-amber-600" />
+                            <span>Enrollment</span>
+                          </div>
+                        </th>
+                        <th className="text-left py-6 px-6 font-bold text-gray-700 dark:text-gray-200">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredStudents.map((student, index) => (
+                        <tr
+                          key={student._id}
+                          className="border-b border-slate-100/50 hover:bg-gradient-to-r hover:from-slate-50/30 hover:to-blue-50/30 transition-all duration-300 dark:border-slate-700/50 dark:hover:from-slate-700/30 dark:hover:to-slate-600/30"
+                          style={{ animationDelay: `${index * 100}ms` }}
+                        >
+                          <td className="py-6 px-6">
+                            <div className="flex items-center space-x-4">
+                              <div className="relative">
+                                {student.profilePicture ?
+                                  (
+                                    <Image
+                                      src={student.profilePicture}
+                                      alt={student.name}
+                                      width={56}
+                                      height={56}
+                                      className="w-14 h-14 rounded-2xl object-cover shadow-lg border-2 border-blue-200 dark:border-blue-600"
+                                    />
 
-                            ) : (
-                              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                                {student.name.charAt(0).toUpperCase()}
+                                  ) : (
+                                    <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                      {student.name.charAt(0).toUpperCase()}
+                                    </div>
+                                  )}
                               </div>
-                            )}
-                          </div>
-                          <div>
-                            <div className="font-bold text-gray-800 dark:text-white text-lg">{student.name}</div>
-                            <div className="text-sm text-gray-600 dark:text-gray-300 flex items-center space-x-1 mt-1">
-                              <Mail className="w-3 h-3 text-amber-600" />
-                              <span>{student.email}</span>
+                              <div>
+                                <div className="font-bold text-gray-800 dark:text-white text-lg">{student.name}</div>
+                                <div className="text-sm text-gray-600 dark:text-gray-300 flex items-center space-x-1 mt-1">
+                                  <Mail className="w-3 h-3 text-amber-600" />
+                                  <span>{student.email}</span>
+                                </div>
+                                <div className="text-sm text-gray-600 dark:text-gray-300 flex items-center space-x-1">
+                                  <Phone className="w-3 h-3 text-orange-600" />
+                                  <span>{student.phone}</span>
+                                </div>
+                              </div>
                             </div>
-                            <div className="text-sm text-gray-600 dark:text-gray-300 flex items-center space-x-1">
-                              <Phone className="w-3 h-3 text-orange-600" />
-                              <span>{student.phone}</span>
+                          </td>
+                          <td className="py-6 px-6">
+                            <div className="text-sm font-semibold text-gray-800 dark:text-white bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-700 dark:to-slate-600 px-4 py-2 rounded-xl inline-block border border-amber-200 dark:border-slate-600">
+                              {student.cnic}
                             </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-6 px-6">
-                        <div className="text-sm font-semibold text-gray-800 dark:text-white bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-700 dark:to-slate-600 px-4 py-2 rounded-xl inline-block border border-amber-200 dark:border-slate-600">
-                          {student.cnic}
-                        </div>
-                      </td>
-                      <td className="py-6 px-6">
-                        <div className="text-sm font-semibold text-gray-800 dark:text-white bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-700 dark:to-slate-600 px-4 py-2 rounded-xl inline-block border border-amber-200 dark:border-slate-600 capitalize">
-                          {student.course}
-                        </div>
-                      </td>
-                      <td className="py-6 px-6">
-                        <div className={`text-xs px-3 py-2 rounded-full font-medium ${student.studentType === 'local' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' : 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300'}`}>
-                          {student.studentType === 'local' ? 'Local' : 'International'}
-                        </div>
-                      </td>
-                      <td className="py-6 px-6 text-sm text-gray-600 dark:text-gray-300 font-medium">
-                        {new Date(student.enrollmentDate).toLocaleDateString('en-GB', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric'
-                        })}
-                      </td>
-                      <td className="py-6 px-6">
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => handleViewDetails(student)}
-                            className="p-3 text-amber-600 hover:bg-amber-50 rounded-xl transition-all duration-300 hover:scale-110 dark:text-amber-400 dark:hover:bg-slate-700 group border border-amber-200 dark:border-amber-700"
-                            title="View Details"
-                          >
-                            <Eye className="w-4 h-4 group-hover:scale-125 transition-transform duration-300" />
-                          </button>
-                          <button
-                            onClick={() => handleEdit(student)}
-                            className="p-3 text-orange-600 hover:bg-orange-50 rounded-xl transition-all duration-300 hover:scale-110 dark:text-orange-400 dark:hover:bg-slate-700 group border border-orange-200 dark:border-orange-700"
-                            title="Edit Student"
-                          >
-                            <Edit className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(student._id)}
-                            className="p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300 hover:scale-110 dark:text-red-400 dark:hover:bg-slate-700 group border border-red-200 dark:border-red-700"
-                            title="Delete Student"
-                          >
-                            <Trash2 className="w-4 h-4 group-hover:scale-125 transition-transform duration-300" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                          </td>
+                          <td className="py-6 px-6">
+                            <div className="text-sm font-semibold text-gray-800 dark:text-white bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-700 dark:to-slate-600 px-4 py-2 rounded-xl inline-block border border-amber-200 dark:border-slate-600 capitalize">
+                              {student.course}
+                            </div>
+                          </td>
+                          <td className="py-6 px-6">
+                            <div className={`text-xs px-3 py-2 rounded-full font-medium ${student.studentType === 'local' ?
+                              'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' : 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300'}`}>
+                              {student.studentType === 'local' ? 'Local' : 'International'}
+                            </div>
+                          </td>
+                          <td className="py-6 px-6 text-sm text-gray-600 dark:text-gray-300 font-medium">
+                            {new Date(student.enrollmentDate).toLocaleDateString('en-GB', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric'
+                            })}
+                          </td>
+                          <td className="py-6 px-6">
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => handleViewDetails(student)}
+                                className="p-3 text-amber-600 hover:bg-amber-50 rounded-xl transition-all duration-300 hover:scale-110 dark:text-amber-400 dark:hover:bg-slate-700 group border border-amber-200 dark:border-amber-700"
+                                title="View Details"
+                              >
+                                <Eye className="w-4 h-4 group-hover:scale-125 transition-transform duration-300" />
+                              </button>
+                              <button
+                                onClick={() => handleEdit(student)}
+                                className="p-3 text-orange-600 hover:bg-orange-50 rounded-xl transition-all duration-300 hover:scale-110 dark:text-orange-400 dark:hover:bg-slate-700 group border border-orange-200 dark:border-orange-700"
+                                title="Edit Student"
+                              >
+                                <Edit className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(student._id)}
+                                className="p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300 hover:scale-110 dark:text-red-400 dark:hover:bg-slate-700 group border border-red-200 dark:border-red-700"
+                                title="Delete Student"
+                              >
+                                <Trash2 className="w-4 h-4 group-hover:scale-125 transition-transform duration-300" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
 
-              {filteredStudents.length === 0 && (
-                <div className="text-center py-20">
-                  <div className="text-8xl mb-6">🔍</div>
-                  <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">No students found</h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-lg">Try adjusting your search or filter criteria</p>
+                  {filteredStudents.length === 0 && (
+                    <div className="text-center py-20">
+                      <div className="text-8xl mb-6">🔍</div>
+                      <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">No students found</h3>
+                      <p className="text-gray-600 dark:text-gray-300 text-lg">Try adjusting your search or filter criteria</p>
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          )}
         </div>
+
 
         {/* Student Details Modal */}
         {showDetailModal && selectedStudent && (
@@ -1069,20 +998,22 @@ const StudentManagementSystem = () => {
                 {/* Profile Section */}
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-700/50 dark:to-slate-600/50 p-6 rounded-2xl border border-blue-200 dark:border-slate-600 text-center">
                   <div className="flex flex-col items-center space-y-4">
-                    {selectedStudent.profilePicture ? (
-                      <Image
-                        src={selectedStudent.profilePicture}
-                        alt={selectedStudent.name}
-                        width={56}   // required
-                        height={56}  // required
-                        className="w-14 h-14 rounded-2xl object-cover shadow-lg border-2 border-blue-200 dark:border-blue-600"
-                      />
+                    {selectedStudent.profilePicture ?
+                      (
+                        <Image
+                          src={selectedStudent.profilePicture}
+                          alt={selectedStudent.name}
+                          width={128}
+                          height={128}
+                          className="w-32 h-32 rounded-full object-cover shadow-xl border-4 border-white dark:border-slate-500"
+                        />
 
-                    ) : (
-                      <div className="w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-5xl shadow-xl">
-                        {selectedStudent.name.charAt(0).toUpperCase()}
-                      </div>
-                    )}
+                      ) :
+                      (
+                        <div className="w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-5xl shadow-xl">
+                          {selectedStudent.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
                     <div>
                       <h3 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">{selectedStudent.name}</h3>
                       <span className={`inline-flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(selectedStudent.status)}`}>
@@ -1155,6 +1086,7 @@ const StudentManagementSystem = () => {
                   </div>
                 </div>
 
+
                 {/* Fee Structure & Payment Details */}
                 <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-700/50 dark:to-slate-600/50 p-6 rounded-2xl border border-amber-200 dark:border-slate-600">
                   <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center space-x-3">
@@ -1210,13 +1142,17 @@ const StudentManagementSystem = () => {
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-gray-800 dark:text-white font-bold">Payment Progress:</span>
                             <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                              {Math.round((selectedStudent.paidAmount / selectedStudent.finalAmount) * 100)}%
+                              {selectedStudent.finalAmount > 0 ?
+                                Math.round((selectedStudent.paidAmount / selectedStudent.finalAmount) * 100) : 0}%
                             </span>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-3 dark:bg-gray-600">
                             <div
                               className="bg-gradient-to-r from-emerald-400 to-blue-500 h-3 rounded-full transition-all duration-1000 shadow-sm"
-                              style={{ width: `${Math.min((selectedStudent.paidAmount / selectedStudent.finalAmount) * 100, 100)}%` }}
+                              style={{
+                                width: `${selectedStudent.finalAmount > 0 ?
+                                  Math.min((selectedStudent.paidAmount / selectedStudent.finalAmount) * 100, 100) : 0}%`
+                              }}
                             ></div>
                           </div>
                         </div>
@@ -1228,17 +1164,21 @@ const StudentManagementSystem = () => {
                   <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-slate-600/50 dark:to-slate-700/50 p-5 rounded-xl border border-blue-200 dark:border-slate-600">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <div className={`p-3 rounded-full ${selectedStudent.status === 'paid' ? 'bg-emerald-100 dark:bg-emerald-900/20' :
-                          selectedStudent.status === 'partial' ? 'bg-amber-100 dark:bg-amber-900/20' :
-                            'bg-red-100 dark:bg-red-900/20'
+                        <div className={`p-3 rounded-full ${selectedStudent.status === 'paid' ?
+                          'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600' :
+                          selectedStudent.status === 'partial' ?
+                            'bg-amber-100 dark:bg-amber-900/20 text-amber-600' :
+                            'bg-red-100 dark:bg-red-900/20 text-red-600'
                           }`}>
                           {getStatusIcon(selectedStudent.status)}
                         </div>
                         <div>
                           <div className="text-lg font-bold text-gray-800 dark:text-white">Payment Status</div>
                           <div className="text-gray-600 dark:text-gray-400">
-                            {selectedStudent.status === 'paid' ? 'All payments completed' :
-                              selectedStudent.status === 'partial' ? 'Partial payment made' :
+                            {selectedStudent.status === 'paid' ?
+                              'All payments completed' :
+                              selectedStudent.status === 'partial' ?
+                                'Partial payment made' :
                                 'Payment pending'}
                           </div>
                         </div>
@@ -1286,7 +1226,7 @@ const StudentManagementSystem = () => {
                   </button>
                   <button
                     onClick={() => setShowDetailModal(false)}
-                    className="px-8 py-4 border-3 border-gray-300 text-gray-700 dark:text-gray-300 rounded-2xl font-bold hover:bg-gray-50 dark:hover:bg-slate-700 transition-all duration-300 hover:scale-105 dark:border-slate-600 text-lg"
+                    className="px-8 py-4 border-2 border-gray-300 text-gray-700 dark:text-gray-300 rounded-2xl font-bold hover:bg-gray-50 dark:hover:bg-slate-700 transition-all duration-300 hover:scale-105 dark:border-slate-600 text-lg"
                   >
                     Close
                   </button>
@@ -1335,10 +1275,10 @@ const StudentManagementSystem = () => {
                       {profilePreview || formData.profilePicture ? (
                         <div className="relative">
                           <Image
-                            src={profilePreview || formData.profilePicture}
+                            src={profilePreview || formData.profilePicture!}
                             alt="Profile Preview"
-                              width={56}   // required
-  height={56}  // required
+                            width={128}
+                            height={128}
                             className="w-32 h-32 rounded-3xl object-cover shadow-xl border-4 border-purple-200 dark:border-purple-600"
                           />
                           <button
@@ -1441,15 +1381,14 @@ const StudentManagementSystem = () => {
                         onChange={(e) => setFormData(prev => ({ ...prev, course: e.target.value as 'basics' | 'advance' | 'pro' }))}
                         className="w-full px-5 py-4 border-2 border-indigo-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 bg-white/70 backdrop-blur-sm dark:bg-slate-700/70 dark:border-slate-600 dark:text-white"
                       >
-                        <option value="">Choose a course...</option>
                         <option value="basics">
-                          Basics - {formData.studentType === 'local' ? '₹20,000' : '$100'}
+                          Basics - {formData.studentType === 'local' ? 'PKR 20,000' : '$100'}
                         </option>
                         <option value="advance">
-                          Advance - {formData.studentType === 'local' ? '₹30,000' : '$200'}
+                          Advance - {formData.studentType === 'local' ? 'PKR 30,000' : '$200'}
                         </option>
                         <option value="pro">
-                          Pro - {formData.studentType === 'local' ? '₹40,000' : '$300'}
+                          Pro - {formData.studentType === 'local' ? 'PKR 40,000' : '$300'}
                         </option>
                       </select>
                     </div>
@@ -1473,7 +1412,7 @@ const StudentManagementSystem = () => {
                             <div className="text-center">
                               <div className="font-bold text-gray-800 dark:text-white capitalize mb-2">{course}</div>
                               <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                                {formData.studentType === 'local' ? `₹${fee.toLocaleString()}` : `${fee}`}
+                                {formData.studentType === 'local' ? `PKR ${fee.toLocaleString()}` : `$${fee}`}
                               </div>
                             </div>
                           </div>
@@ -1482,6 +1421,7 @@ const StudentManagementSystem = () => {
                     </div>
                   )}
                 </div>
+
 
                 {/* Personal Information */}
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-slate-700/50 dark:to-slate-600/50 p-6 rounded-2xl border border-green-200 dark:border-slate-600">
@@ -1574,8 +1514,7 @@ const StudentManagementSystem = () => {
                   <div className="grid md:grid-cols-4 gap-6">
                     <div>
                       <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
-                        Base Fee ({formData.studentType === 'local' ? '₹' : ''
-                        })
+                        Base Fee ({formData.studentType === 'local' ? 'PKR ' : '$'})
                       </label>
                       <input
                         type="number"
@@ -1604,8 +1543,7 @@ const StudentManagementSystem = () => {
 
                     <div>
                       <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
-                        Final Amount ({formData.studentType === 'local' ? '₹' : ''
-                        })
+                        Final Amount ({formData.studentType === 'local' ? 'PKR ' : '$'})
                       </label>
                       <input
                         type="number"
@@ -1617,8 +1555,7 @@ const StudentManagementSystem = () => {
 
                     <div>
                       <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
-                        Amount Paid ({formData.studentType === 'local' ? '₹' : ' '
-                        })
+                        Amount Paid ({formData.studentType === 'local' ? 'PKR ' : '$'})
                       </label>
                       <input
                         type="number"
@@ -1662,7 +1599,7 @@ const StudentManagementSystem = () => {
                   )}
 
                   {/* Payment Progress */}
-                  {formData.finalAmount && formData.paidAmount && (
+                  {Number(formData.finalAmount) > 0 && (
                     <div className="mt-6 p-5 bg-white/60 dark:bg-slate-800/60 rounded-2xl border border-blue-200 dark:border-slate-600">
                       <div className="flex justify-between items-center text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
                         <span>Payment Progress</span>
@@ -1693,8 +1630,8 @@ const StudentManagementSystem = () => {
                     </label>
                     <select
                       value={formData.status}
-                      onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                      className="w-full px-5 py-4 border-2 border-amber-200 rounded-2xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-300 bg-white/70 backdrop-blur-sm dark:bg-slate-700/70 dark:border-slate-600 dark:text-white"
+                      disabled
+                      className="w-full px-5 py-4 border-2 border-gray-300 rounded-2xl bg-gray-100 dark:bg-slate-600 dark:border-slate-500 dark:text-white font-bold"
                     >
                       <option value="pending">Pending</option>
                       <option value="partial">Partial Payment</option>
@@ -1732,22 +1669,23 @@ const StudentManagementSystem = () => {
                     disabled={submitLoading}
                     className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-5 px-8 rounded-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
-                    {submitLoading ? (
-                      <>
-                        <Loader2 className="w-6 h-6 animate-spin" />
-                        <span className="text-lg">{editingStudent ? 'Updating Student...' : 'Adding Student...'}</span>
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-6 h-6" />
-                        <span className="text-lg">{editingStudent ? 'Update Student' : 'Add Student'}</span>
-                      </>
-                    )}
+                    {submitLoading ?
+                      (
+                        <>
+                          <Loader2 className="w-6 h-6 animate-spin" />
+                          <span className="text-lg">{editingStudent ? 'Updating Student...' : 'Adding Student...'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-6 h-6" />
+                          <span className="text-lg">{editingStudent ? 'Update Student' : 'Add Student'}</span>
+                        </>
+                      )}
                   </button>
                   <button
                     onClick={resetForm}
                     disabled={submitLoading}
-                    className="px-8 py-5 border-3 border-gray-300 text-gray-700 dark:text-gray-300 rounded-2xl font-bold hover:bg-gray-50 dark:hover:bg-slate-700 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none dark:border-slate-600 text-lg"
+                    className="px-8 py-5 border-2 border-gray-300 text-gray-700 dark:text-gray-300 rounded-2xl font-bold hover:bg-gray-50 dark:hover:bg-slate-700 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none dark:border-slate-600 text-lg"
                   >
                     Cancel
                   </button>

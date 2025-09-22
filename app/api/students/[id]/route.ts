@@ -10,6 +10,7 @@ interface StudentUpdateData {
   course?: string;
   feeAmount?: number;
   paidAmount?: number;
+    finalAmount: number;  
   status?: string;
   enrollmentDate?: string;
   notes?: string;
@@ -120,14 +121,16 @@ export async function PUT(
       }
     }
 
-    // Auto-calculate status based on payment
-    if (updateData.paidAmount >= updateData.feeAmount) {
-      updateData.status = 'paid';
-    } else if (updateData.paidAmount > 0) {
-      updateData.status = 'partial';
-    } else {
-      updateData.status = 'pending';
-    }
+  // Auto-calculate status based on payment (consider finalAmount after discount)
+const finalAmount = Number(body.finalAmount) || updateData.feeAmount;
+
+if (updateData.paidAmount >= finalAmount) {
+  updateData.status = 'paid';
+} else if (updateData.paidAmount > 0) {
+  updateData.status = 'partial';
+} else {
+  updateData.status = 'pending';
+}
 
     // Update student
     const updatedStudent = await Student.findByIdAndUpdate(
