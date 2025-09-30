@@ -5,10 +5,10 @@ import mongoose from "mongoose";
 
 interface StudentUpdateData {
   cnic: any;
-  studentType: any;
-  discount: any;
-  discountAmount: any;
-  profilePicture: any;
+  studentType:string;
+  discount: number;
+  discountAmount:number;
+  profilePicture: string;
   name?: string;
   email?: string;
   phone?: string;
