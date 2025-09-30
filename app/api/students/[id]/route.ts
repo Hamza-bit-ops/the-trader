@@ -4,6 +4,11 @@ import Student from "@/src/models/student";
 import mongoose from "mongoose";
 
 interface StudentUpdateData {
+  cnic: any;
+  studentType: any;
+  discount: any;
+  discountAmount: any;
+  profilePicture: any;
   name?: string;
   email?: string;
   phone?: string;
@@ -89,11 +94,17 @@ export async function PUT(
       name: body.name?.trim(),
       email: body.email?.toLowerCase().trim(),
       phone: body.phone?.trim(),
+      cnic: body.cnic?.trim(), // ADDED
+      studentType: body.studentType, // ADDED
       course: body.course?.trim(),
       feeAmount: Number(body.feeAmount),
       paidAmount: Number(body.paidAmount) || 0,
+      discount: Number(body.discount) || 0, // ADDED
+      discountAmount: Number(body.discountAmount) || 0, // ADDED
+      finalAmount: Number(body.finalAmount), // ADDED
       status: body.status,
       enrollmentDate: body.enrollmentDate ? new Date(body.enrollmentDate) : undefined,
+      profilePicture: body.profilePicture !== undefined ? body.profilePicture : existingStudent.profilePicture, // ADDED
       notes: body.notes?.trim() || ''
     };
 
