@@ -99,7 +99,6 @@ const StudentManagementSystem = () => {
       status = "partial";
     }
 
-    // Force status = paid agar editing hai aur record already paid tha
     if (editingStudent && editingStudent.status === "paid" && paidAmount === finalAmount) {
       status = "paid";
     }
@@ -123,7 +122,6 @@ const StudentManagementSystem = () => {
         const data = await res.json();
         setStudents(data);
       } else {
-        // Demo data with enhanced structure
         setStudents([
           {
             _id: '1',
@@ -212,7 +210,6 @@ const StudentManagementSystem = () => {
     };
     reader.readAsDataURL(file);
   };
-  // Remove profile picture
   const removeProfilePicture = () => {
     setFormData(prev => ({ ...prev, profilePicture: '' }));
     setProfilePreview('');

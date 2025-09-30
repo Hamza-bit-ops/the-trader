@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect, useMemo, useRef, ReactNode } from 'react';
-import { Search, Filter, Edit, Trash2, Phone, Mail, DollarSign, Clock, CheckCircle, XCircle, AlertCircle, User, Calendar, BookOpen, Loader2, Star, TrendingUp, CreditCard, Percent, Upload, X, Camera, Save, UserPlus, Eye, EyeOff, Download, FileText, Lock } from 'lucide-react';
+import React, { useState, ReactNode } from 'react';
+import {  AlertCircle, Eye, EyeOff,Lock } from 'lucide-react';
 
 // Password Protection Component
 const PasswordProtection = ({ children }: { children: ReactNode }) => {
