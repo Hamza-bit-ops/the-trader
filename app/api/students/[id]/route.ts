@@ -4,7 +4,7 @@ import Student from "@/src/models/student";
 import mongoose from "mongoose";
 
 interface StudentUpdateData {
-  cnic: any;
+  cnic: string;
   studentType:string;
   discount: number;
   discountAmount:number;
