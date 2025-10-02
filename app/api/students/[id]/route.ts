@@ -132,18 +132,16 @@ export async function PUT(
       }
     }
 
-  // Auto-calculate status based on payment (consider finalAmount after discount)
-const finalAmount = Number(body.finalAmount) || updateData.feeAmount;
-
-if (updateData.paidAmount >= finalAmount) {
+if (updateData.finalAmount === 0) {
+  // 100% discount case - automatically mark as paid
+  updateData.status = 'paid';
+} else if (updateData.paidAmount >= updateData.finalAmount) {
   updateData.status = 'paid';
 } else if (updateData.paidAmount > 0) {
   updateData.status = 'partial';
 } else {
   updateData.status = 'pending';
 }
-
-    // Update student
     const updatedStudent = await Student.findByIdAndUpdate(
       id, 
       updateData, 

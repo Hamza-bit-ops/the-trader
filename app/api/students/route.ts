@@ -64,12 +64,28 @@ export async function POST(req: NextRequest) {
     
     const body: StudentCreateData = await req.json();
     
-    // Validate required fields
+    console.log('=== RECEIVED BODY ===');
+    console.log(JSON.stringify(body, null, 2));
+    console.log('====================');
+    
+    // Validate required fields - IMPORTANT: Allow 0 values for feeAmount and finalAmount
     const { name, email, phone, cnic, studentType, course, feeAmount, finalAmount, enrollmentDate } = body;
     
-    if (!name || !email || !phone || !cnic || !studentType || !course || !feeAmount || !finalAmount || !enrollmentDate) {
+    const missingFields = [];
+    if (!name?.trim()) missingFields.push('name');
+    if (!email?.trim()) missingFields.push('email');
+    if (!phone?.trim()) missingFields.push('phone');
+    if (!cnic?.trim()) missingFields.push('cnic');
+    if (!studentType) missingFields.push('studentType');
+    if (!course) missingFields.push('course');
+    if (feeAmount === undefined || feeAmount === null) missingFields.push('feeAmount');
+    if (finalAmount === undefined || finalAmount === null) missingFields.push('finalAmount');
+    if (!enrollmentDate) missingFields.push('enrollmentDate');
+    
+    if (missingFields.length > 0) {
+      console.error('Missing fields:', missingFields);
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: `Missing required fields: ${missingFields.join(', ')}` },
         { status: 400 }
       );
     }
@@ -111,11 +127,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate payment amounts
+    // Validate payment amounts - only if finalAmount > 0
     const paidAmount = Number(body.paidAmount) || 0;
     const finalAmountNum = Number(finalAmount);
     
-    if (paidAmount > finalAmountNum) {
+    if (finalAmountNum > 0 && paidAmount > finalAmountNum) {
       return NextResponse.json(
         { error: "Paid amount cannot exceed final amount" },
         { status: 400 }
@@ -142,13 +158,20 @@ export async function POST(req: NextRequest) {
     };
 
     // Auto-calculate status based on payment
-    if (studentData.paidAmount >= studentData.finalAmount) {
+    if (finalAmountNum === 0) {
+      // 100% discount case - automatically mark as paid
+      studentData.status = 'paid';
+    } else if (studentData.paidAmount >= studentData.finalAmount) {
       studentData.status = 'paid';
     } else if (studentData.paidAmount > 0) {
       studentData.status = 'partial';
     } else {
       studentData.status = 'pending';
     }
+
+    console.log('=== CREATING STUDENT ===');
+    console.log(JSON.stringify(studentData, null, 2));
+    console.log('========================');
 
     const student = await Student.create(studentData);
     

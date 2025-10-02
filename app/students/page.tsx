@@ -93,7 +93,11 @@ const StudentManagementSystem = () => {
     const paidAmount = Number(formData.paidAmount) || 0;
 
     let status = "pending";
-    if (paidAmount === finalAmount && finalAmount > 0) {
+    
+    // If 100% discount (finalAmount = 0), automatically mark as paid
+    if (finalAmount === 0) {
+      status = "paid";
+    } else if (paidAmount === finalAmount && finalAmount > 0) {
       status = "paid";
     } else if (paidAmount > 0 && paidAmount < finalAmount) {
       status = "partial";
@@ -111,8 +115,6 @@ const StudentManagementSystem = () => {
       status,
     }));
   }, [formData.studentType, formData.course, formData.discount, formData.paidAmount, feeStructure, editingStudent]);
-
-
 
   const loadStudents = async () => {
     setLoading(true);
@@ -541,17 +543,27 @@ const StudentManagementSystem = () => {
       default: return <Clock className="w-4 h-4" />;
     }
   };
-  const filteredStudents = useMemo(() => students.filter(student => {
-    const searchTermLower = searchTerm.toLowerCase();
-    const matchesSearch = student.name.toLowerCase().includes(searchTermLower) ||
-      student.email.toLowerCase().includes(searchTermLower) ||
-      student.phone.includes(searchTerm) ||
-      student.cnic.toLowerCase().includes(searchTermLower);
-    const matchesStatus = statusFilter === 'all' || student.status === statusFilter;
-    const matchesCourse = courseFilter === 'all' || student.course === courseFilter;
-    const matchesType = studentTypeFilter === 'all' || student.studentType === studentTypeFilter;
-    return matchesSearch && matchesStatus && matchesCourse && matchesType;
-  }), [students, searchTerm, statusFilter, courseFilter, studentTypeFilter]);
+  const filteredStudents = useMemo(() => {
+    const filtered = students.filter(student => {
+      const searchTermLower = searchTerm.toLowerCase();
+      const matchesSearch = student.name.toLowerCase().includes(searchTermLower) ||
+        student.email.toLowerCase().includes(searchTermLower) ||
+        student.phone.includes(searchTerm) ||
+        student.cnic.toLowerCase().includes(searchTermLower);
+      const matchesStatus = statusFilter === 'all' || student.status === statusFilter;
+      const matchesCourse = courseFilter === 'all' || student.course === courseFilter;
+      const matchesType = studentTypeFilter === 'all' || student.studentType === studentTypeFilter;
+      return matchesSearch && matchesStatus && matchesCourse && matchesType;
+    });
+
+    // Sort by enrollment date: newest first (oldest at bottom)
+    return filtered.sort((a, b) => {
+      const dateA = new Date(a.enrollmentDate).getTime();
+      const dateB = new Date(b.enrollmentDate).getTime();
+      return dateB - dateA; // Descending order (newest first)
+    });
+  }, [students, searchTerm, statusFilter, courseFilter, studentTypeFilter]);
+
   const stats = useMemo(() => {
     const localStudents = students.filter(s => s.studentType === 'local');
     const foreignStudents = students.filter(s => s.studentType === 'foreigner');
