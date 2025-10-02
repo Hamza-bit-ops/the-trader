@@ -1,6 +1,6 @@
 // app/students/page.tsx
 import StudentManagementSystem from "../students/page";
-import PasswordProtection from "../../src/components/passwordProtection/page"
+import PasswordProtection from "../../src/components/passwordProtection"
 
 export default function StudentsPage() {
   return (

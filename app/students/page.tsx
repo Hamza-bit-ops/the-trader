@@ -818,7 +818,7 @@ const StudentManagementSystem = () => {
                   {filteredStudents.length === 0 ? (
                     <div className="text-center py-20">
                       <div className="text-8xl mb-6">🔍</div>
-                      <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">No students found</h3>
+                      <h3 className="text-2xl font-bold text-gray-800 dark:te xt-white mb-3">No students found</h3>
                       <p className="text-gray-600 dark:text-gray-300 text-lg">Try adjusting your search or filter criteria</p>
                     </div>
                   ) : (
