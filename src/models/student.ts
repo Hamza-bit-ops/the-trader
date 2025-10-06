@@ -69,7 +69,6 @@ const StudentSchema = new Schema<IStudent>(
     },
     feeAmount: { 
       type: Number, 
-      required: [true, 'Fee amount is required'],
       min: [0, 'Fee amount cannot be negative']
     },
     paidAmount: { 
@@ -90,7 +89,6 @@ const StudentSchema = new Schema<IStudent>(
     },
     finalAmount: {
       type: Number,
-      required: [true, 'Final amount is required'],
       min: [0, 'Final amount cannot be negative']
     },
     status: { 
@@ -103,7 +101,6 @@ const StudentSchema = new Schema<IStudent>(
     },
     enrollmentDate: { 
       type: Date, 
-      required: [true, 'Enrollment date is required']
     },
     profilePicture: {
       type: String,

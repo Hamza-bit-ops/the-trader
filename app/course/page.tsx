@@ -201,7 +201,7 @@ export default function CoursesPage() {
                 rating: "4.8",
                 price: "PKR 20,000",
                 originalPrice: "PKR 30,000",
-                href: "/courses/basics",
+                href: "/students-application",
                 gradient: "from-blue-600 to-indigo-700",
                 popular: false
               },
@@ -222,7 +222,7 @@ export default function CoursesPage() {
                 rating: "4.9",
                 price: "PKR 30,000",
                 originalPrice: "PKR 45,000",
-                href: "/courses/advance",
+                href: "/students-application",
                 gradient: "from-cyan-500 to-blue-600",
                 popular: true
               },
@@ -243,7 +243,7 @@ export default function CoursesPage() {
                 rating: "4.9",
                 price: "PKR 40,000",
                 originalPrice: "PKR 60,000",
-                href: "/courses/pro",
+                href: "/students-application",
                 gradient: "from-blue-600 to-indigo-700",
                 popular: false
               }

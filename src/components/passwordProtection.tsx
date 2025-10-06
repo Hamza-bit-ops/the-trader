@@ -1,33 +1,74 @@
 "use client";
-import React, { useState, ReactNode } from 'react';
-import {  AlertCircle, Eye, EyeOff,Lock } from 'lucide-react';
+import React, { useState, useEffect, ReactNode } from 'react';
+import { AlertCircle, Eye, EyeOff, Lock } from 'lucide-react';
 
-// Password Protection Component
-const PasswordProtection = ({ children }: { children: ReactNode }) => {  const [password, setPassword] = useState('');
+const PasswordProtection = ({ children }: { children: ReactNode }) => {
+  const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Check authentication status on component mount
+  useEffect(() => {
+    const authStatus = sessionStorage.getItem('isAuthenticated');
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+    }
+    setIsLoading(false);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
     
-    // Simulate authentication process
     setTimeout(() => {
       if (password === 'gul-sher') {
         setIsAuthenticated(true);
+        // Store authentication in sessionStorage
+        sessionStorage.setItem('isAuthenticated', 'true');
       } else {
         setError('Incorrect password. Please try again.');
-        setPassword(''); // Clear password field on error
+        setPassword('');
       }
       setIsLoading(false);
     }, 800);
   };
 
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('isAuthenticated');
+  };
+
+  // Show loading state while checking authentication
+  if (isLoading && !isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+          <p className="text-gray-600 font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (isAuthenticated) {
-    return <>{children}</>;
+    return (
+      <div>
+        {/* Optional: Add logout button */}
+        <div className="fixed top-4 right-4 z-50">
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 flex items-center space-x-2"
+          >
+            <Lock className="w-4 h-4" />
+            <span>Logout</span>
+          </button>
+        </div>
+        {children}
+      </div>
+    );
   }
 
   return (
@@ -73,7 +114,7 @@ const PasswordProtection = ({ children }: { children: ReactNode }) => {  const [
           </div>
 
           {error && (
-            <div className="flex items-center space-x-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-xl">
+            <div className="flex items-center space-x-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-xl animate-shake">
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
               <p className="text-sm">{error}</p>
             </div>
@@ -97,10 +138,24 @@ const PasswordProtection = ({ children }: { children: ReactNode }) => {  const [
             )}
           </button>
         </form>
+
+        <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+          <p>Session will persist until browser is closed</p>
+        </div>
       </div>
+
+      <style jsx>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-10px); }
+          75% { transform: translateX(10px); }
+        }
+        .animate-shake {
+          animation: shake 0.5s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 };
 
 export default PasswordProtection;
-

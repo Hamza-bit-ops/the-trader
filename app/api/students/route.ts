@@ -9,13 +9,13 @@ interface StudentCreateData {
   cnic: string;
   studentType: 'local' | 'foreigner';
   course: 'basics' | 'advance' | 'pro';
-  feeAmount: number;
+  feeAmount?: number;
   paidAmount: number;
   discount: number;
   discountAmount: number;
-  finalAmount: number;
+  finalAmount?: number;
   status: string;
-  enrollmentDate: string;
+  enrollmentDate?: string;
   profilePicture?: string;
   notes?: string;
 }
@@ -23,15 +23,15 @@ interface StudentCreateData {
 // Helper function to validate base64 image
 const isValidBase64Image = (str: string): boolean => {
   if (!str || typeof str !== 'string') return false;
-  
+
   // Check if it's a valid data URL format
   const dataURLRegex = /^data:image\/(jpeg|jpg|png|gif|webp);base64,/;
   if (!dataURLRegex.test(str)) return false;
-  
+
   // Extract base64 part
   const base64Part = str.split(',')[1];
   if (!base64Part) return false;
-  
+
   // Check if it's valid base64
   try {
     const decoded = atob(base64Part);
@@ -61,16 +61,16 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
-    
+
     const body: StudentCreateData = await req.json();
-    
+
     console.log('=== RECEIVED BODY ===');
     console.log(JSON.stringify(body, null, 2));
     console.log('====================');
-    
+
     // Validate required fields - IMPORTANT: Allow 0 values for feeAmount and finalAmount
-    const { name, email, phone, cnic, studentType, course, feeAmount, finalAmount, enrollmentDate } = body;
-    
+    const { name, email, phone, cnic, studentType, course } = body;
+
     const missingFields = [];
     if (!name?.trim()) missingFields.push('name');
     if (!email?.trim()) missingFields.push('email');
@@ -78,10 +78,8 @@ export async function POST(req: NextRequest) {
     if (!cnic?.trim()) missingFields.push('cnic');
     if (!studentType) missingFields.push('studentType');
     if (!course) missingFields.push('course');
-    if (feeAmount === undefined || feeAmount === null) missingFields.push('feeAmount');
-    if (finalAmount === undefined || finalAmount === null) missingFields.push('finalAmount');
-    if (!enrollmentDate) missingFields.push('enrollmentDate');
-    
+
+
     if (missingFields.length > 0) {
       console.error('Missing fields:', missingFields);
       return NextResponse.json(
@@ -129,8 +127,8 @@ export async function POST(req: NextRequest) {
 
     // Validate payment amounts - only if finalAmount > 0
     const paidAmount = Number(body.paidAmount) || 0;
-    const finalAmountNum = Number(finalAmount);
-    
+    const finalAmountNum = Number(body.finalAmount);
+
     if (finalAmountNum > 0 && paidAmount > finalAmountNum) {
       return NextResponse.json(
         { error: "Paid amount cannot exceed final amount" },
@@ -146,13 +144,13 @@ export async function POST(req: NextRequest) {
       cnic: cnic.trim(),
       studentType,
       course,
-      feeAmount: Number(feeAmount),
-      paidAmount,
+      feeAmount: body.feeAmount !== undefined ? Number(body.feeAmount) : 0,
+      paidAmount: Number(body.paidAmount) || 0,
       discount: Number(body.discount) || 0,
       discountAmount: Number(body.discountAmount) || 0,
-      finalAmount: finalAmountNum,
+      finalAmount: body.finalAmount !== undefined ? Number(body.finalAmount) : 0,
       status: body.status || 'pending',
-      enrollmentDate: new Date(enrollmentDate),
+      enrollmentDate: body.enrollmentDate ? new Date(body.enrollmentDate) : new Date(),
       profilePicture: body.profilePicture || '',
       notes: body.notes?.trim() || ''
     };
@@ -174,11 +172,11 @@ export async function POST(req: NextRequest) {
     console.log('========================');
 
     const student = await Student.create(studentData);
-    
+
     return NextResponse.json(student, { status: 201 });
   } catch (error) {
     console.error("Error creating student:", error);
-    
+
     if (error instanceof Error) {
       // Handle specific mongoose validation errors
       if (error.name === 'ValidationError') {
@@ -187,7 +185,7 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
-      
+
       // Handle duplicate key errors
       if (error.message.includes('E11000')) {
         return NextResponse.json(
@@ -196,7 +194,7 @@ export async function POST(req: NextRequest) {
         );
       }
     }
-    
+
     return NextResponse.json(
       { error: "Failed to create student" },
       { status: 500 }
