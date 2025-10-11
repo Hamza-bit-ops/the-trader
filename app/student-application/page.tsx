@@ -15,6 +15,7 @@ interface StudentFormData {
     cnic: string;
     studentType: StudentType;
     course: CourseType;
+    status?: string;
 }
 
 const StudentApplicationForm = () => {
@@ -29,6 +30,7 @@ const StudentApplicationForm = () => {
         cnic: "",
         studentType: "local",
         course: "basics",
+        status: 'pending',
     });
 
     const courseInfo = {
@@ -49,7 +51,7 @@ const StudentApplicationForm = () => {
         setLoading(true);
 
         try {
-            const res = await fetch('/api/students', {
+            const res = await fetch('/api/students-the', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
@@ -108,7 +110,7 @@ const StudentApplicationForm = () => {
                         Th3 Trad3rs Consultancy
                     </h1>
                     <p className="text-xl text-gray-600 font-medium">Student Application Form</p>
-                    <p className="text-gray-500 mt-2">Apply now to join our trading academy</p>
+                    <p className="text-gray-500 mt-2">Apply now !</p>
                 </div>
 
                 {/* Application Form */}

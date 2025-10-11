@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Search, Filter, Edit, Trash2, Phone, Mail, DollarSign, Clock, CheckCircle, XCircle, AlertCircle, User, Calendar, BookOpen, Loader2, Star, TrendingUp, CreditCard, Percent, Upload, X, Camera, Save, UserPlus, Eye, EyeOff, Download, FileText } from 'lucide-react';
+import { Search, Filter, Edit, Trash2, Phone, Mail, DollarSign, Clock, CheckCircle, XCircle, AlertCircle, User, Calendar, BookOpen, Loader2, Star, TrendingUp, CreditCard, Percent, Upload, X, Camera, Save, UserPlus, Eye, EyeOff, Download, FileText, LogOut, Lock } from 'lucide-react';
 import Image from "next/image";
 
 interface Student {
@@ -41,6 +41,11 @@ const StudentManagementSystem = () => {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const CORRECT_PASSWORD = 'gul-sher';
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -75,9 +80,10 @@ const StudentManagementSystem = () => {
   );
   // Load students data
   useEffect(() => {
-    loadStudents();
-  }, []);
-
+    if (isAuthenticated) {
+      loadStudents();
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const studentType = formData.studentType;
@@ -93,7 +99,7 @@ const StudentManagementSystem = () => {
     const paidAmount = Number(formData.paidAmount) || 0;
 
     let status = "pending";
-    
+
     // If 100% discount (finalAmount = 0), automatically mark as paid
     if (finalAmount === 0) {
       status = "paid";
@@ -116,10 +122,33 @@ const StudentManagementSystem = () => {
     }));
   }, [formData.studentType, formData.course, formData.discount, formData.paidAmount, feeStructure, editingStudent]);
 
+
+  // Password Login Handler
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordInput === CORRECT_PASSWORD) {
+      setIsAuthenticated(true);
+      setPasswordError('');
+      setPasswordInput('');
+    } else {
+      setPasswordError('Incorrect password. Please try again.');
+      setPasswordInput('');
+    }
+  };
+
+  // Logout Handler
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setPasswordInput('');
+    setPasswordError('');
+  };
+
+
+
   const loadStudents = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/students");
+      const res = await fetch("/api/students-the");
       if (res.ok) {
         const data = await res.json();
         setStudents(data);
@@ -260,7 +289,7 @@ const StudentManagementSystem = () => {
       };
       if (editingStudent) {
         // Update existing student
-        const res = await fetch(`/api/students/${editingStudent._id}`, {
+        const res = await fetch(`/api/students-the/${editingStudent._id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestData),
@@ -279,7 +308,7 @@ const StudentManagementSystem = () => {
         }
       } else {
         // Create new student
-        const res = await fetch("/api/students", {
+        const res = await fetch("/api/students-the", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestData),
@@ -356,7 +385,7 @@ const StudentManagementSystem = () => {
 
     setLoading(true);
     try {
-      const res = await fetch(`/api/students/${studentId}`, {
+      const res = await fetch(`/api/students-the/${studentId}`, {
         method: "DELETE"
       });
       if (res.ok) {
@@ -668,9 +697,83 @@ const StudentManagementSystem = () => {
       </div>
     </div>
   );
+
+
+if (!isAuthenticated) {
   return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+      <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-md p-8 transform animate-modal border border-slate-200/50">
+        <div className="text-center mb-8">
+          <div className="inline-block p-4 bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl shadow-lg mb-4">
+            <Lock className="w-16 h-16 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-2">
+            Student Management
+          </h1>
+          <p className="text-gray-600 text-lg">Enter password to access the system</p>
+        </div>
+
+        <form onSubmit={handlePasswordSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-3">
+              Password
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-amber-600 w-5 h-5" />
+              <input
+                type={showPassword ? "text" : "password"}
+                value={passwordInput}
+                onChange={(e) => {
+                  setPasswordInput(e.target.value);
+                  setPasswordError('');
+                }}
+                className="w-full pl-12 pr-12 py-4 border-2 border-amber-200 rounded-2xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-300 bg-white/70 backdrop-blur-sm text-gray-800 placeholder-gray-500"
+                placeholder="Enter password"
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-amber-600 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+            {passwordError && (
+              <div className="mt-3 flex items-center space-x-2 text-red-600">
+                <AlertCircle className="w-4 h-4" />
+                <span className="text-sm font-medium">{passwordError}</span>
+              </div>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3"
+          >
+            <Lock className="w-5 h-5" />
+            <span>Login</span>
+          </button>
+        </form>
+
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-500">
+            Th3 Trad3rs Consultancy © 2024
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+  return (
+
+
+
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 lg:p-6 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <div className="max-w-7xl mx-auto">
+
+
         {/* Header Section */}
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-6 lg:p-8 mb-8 border border-slate-200/50 dark:bg-slate-800/90 dark:border-slate-700/50">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
@@ -694,6 +797,15 @@ const StudentManagementSystem = () => {
             >
               <UserPlus className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
               <span>Add New Student</span>
+
+              <button
+  onClick={handleLogout}
+  className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-2"
+  title="Logout"
+>
+  <LogOut className="w-5 h-5" />
+  <span className="hidden sm:block">Logout</span>
+</button>
             </button>
           </div>
 

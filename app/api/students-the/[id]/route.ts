@@ -15,7 +15,7 @@ interface StudentUpdateData {
   course?: string;
   feeAmount?: number;
   paidAmount?: number;
-    finalAmount: number;  
+  finalAmount: number;  
   status?: string;
   enrollmentDate?: string;
   notes?: string;
