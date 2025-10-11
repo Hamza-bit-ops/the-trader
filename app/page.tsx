@@ -433,7 +433,7 @@ export default function Home() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
               <a
-                href="#"
+                href="/student-application"
                 className="group bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-4 rounded-full font-semibold shadow-xl hover:shadow-2xl hover:shadow-cyan-500/30 transform hover:scale-105 transition-all duration-300 flex items-center space-x-2"
               >
                 <span>Start Learning Today</span>
@@ -443,7 +443,7 @@ export default function Home() {
               </a>
               
               <a
-                href="#"
+                href="/course"
                 className="group border-2 border-cyan-400/50 text-cyan-300 hover:text-white px-8 py-4 rounded-full font-semibold hover:bg-cyan-500/20 hover:border-cyan-400 backdrop-blur-sm transition-all duration-300 flex items-center space-x-2 shadow-lg"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -570,204 +570,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Courses Overview */}
-      <section className="py-20 bg-gradient-to-br from-slate-950 via-blue-950/90 to-indigo-950/80 relative overflow-hidden">
-        {/* Background Trading Charts */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute bottom-20 right-20 animate-float">
-            <svg width="150" height="100">
-              {[...Array(8)].map((_, i) => {
-                const isGreen = i % 2 === 0;
-                const height = 15 + Math.random() * 25;
-                return (
-                  <rect 
-                    key={i}
-                    x={i * 18} 
-                    y={80 - height} 
-                    width="10" 
-                    height={height} 
-                    fill={isGreen ? "#10b981" : "#ef4444"}
-                    className="animate-candle-pulse"
-                    style={{animationDelay: `${i * 100}ms`}}
-                  />
-                );
-              })}
-            </svg>
-          </div>
-          
-          <div className="absolute top-40 left-20 animate-float delay-1000">
-            <svg width="120" height="80">
-              <path d="M0,40 Q30,30 60,35 T120,25" stroke="#22d3ee" strokeWidth="2" fill="none" className="animate-dash"/>
-              <path d="M0,50 Q30,42 60,45 T120,38" stroke="#3b82f6" strokeWidth="1.5" fill="none" className="animate-dash delay-300"/>
-            </svg>
-          </div>
-        </div>
-
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
-              Our Trading Courses
-            </h2>
-            <p className="text-slate-300 text-lg max-w-2xl mx-auto">
-              Choose from our comprehensive range of forex trading courses designed for every skill level
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              {
-                title: "Basic Course",
-                level: "Beginner",
-                description: "Learn forex trading from scratch with our comprehensive beginner-friendly curriculum covering fundamentals.",
-                duration: "3 Month",
-                students: "200+",
-                rating: "4.8",
-                price: "PKR 20,000",
-                originalPrice: "PKR 30,000",
-                gradient: "from-blue-600 to-indigo-700",
-                modules: ["Forex Basics", "Chart Reading", "Technical Analysis", "Risk Management"],
-                badge: "Most Popular"
-              },
-              {
-                title: "Advance Course",
-                level: "Intermediate",
-                description: "Deep dive into technical analysis, risk management, and advanced trading strategies for serious traders.",
-                duration: "5 Month",
-                students: "180+",
-                rating: "4.9",
-                price: "PKR 30,000",
-                originalPrice: "PKR 45,000",
-                gradient: "from-cyan-500 to-blue-600",
-                modules: ["Advanced Patterns", "Market Structure", "Trading Psychology", "Live Trading"],
-                badge: "Best Value"
-              },
-              {
-                title: "Pro Course",
-                level: "Advanced",
-                description: "Master-level training with live trading sessions, advanced psychology, and institutional strategies.",
-                duration: "8 Month",
-                students: "120+",
-                rating: "4.9",
-                price: "PKR 40,000",
-                originalPrice: "PKR 60,000",
-                gradient: "from-blue-600 to-indigo-700",
-                modules: ["Institutional Trading", "Algorithm Design", "Portfolio Management", "1-on-1 Mentorship"],
-                badge: "Premium"
-              }
-            ].map((course, index) => (
-              <div 
-                key={index}
-                className="group bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-xl shadow-lg rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-cyan-500/20 transform hover:-translate-y-3 hover:scale-105 transition-all duration-500 border border-slate-700/50 hover:border-cyan-500/50 relative"
-                style={{ animationDelay: `${index * 200}ms` }}
-              >
-                {/* Badge */}
-                <div className="absolute top-4 left-4 z-20">
-                  <span className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-xs px-3 py-1.5 rounded-full font-bold shadow-lg">
-                    {course.badge}
-                  </span>
-                </div>
-
-                <div className="relative overflow-hidden">
-                  <div className={`w-full h-52 bg-gradient-to-br ${course.gradient} flex items-center justify-center relative overflow-hidden`}>
-                    {/* Animated Trading Chart in Background */}
-                    <svg width="100%" height="100%" className="absolute inset-0 opacity-20">
-                      {[...Array(10)].map((_, i) => {
-                        const isGreen = i % 2 === 0;
-                        const height = 20 + Math.random() * 40;
-                        return (
-                          <rect 
-                            key={i}
-                            x={20 + i * 28} 
-                            y={120 - height} 
-                            width="10" 
-                            height={height} 
-                            fill={isGreen ? "#10b981" : "#ef4444"}
-                            className="animate-candle-pulse"
-                            style={{animationDelay: `${i * 150}ms`}}
-                          />
-                        );
-                      })}
-                    </svg>
-                    
-                    <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-transparent"></div>
-                    <div className="text-7xl opacity-40 relative z-10 group-hover:scale-110 transition-transform duration-500">📊</div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent"></div>
-                  </div>
-                  
-                  <div className="absolute top-4 right-4 bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-full font-semibold shadow-lg flex items-center">
-                    {course.rating} ⭐
-                  </div>
-                </div>
-                
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-cyan-400 text-sm font-semibold bg-cyan-500/20 border border-cyan-400/40 px-3 py-1.5 rounded-full">
-                      {course.duration}
-                    </span>
-                    <span className="text-slate-400 text-sm flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-                      </svg>
-                      {course.students}
-                    </span>
-                  </div>
-                  
-                  <div className="mb-2">
-                    <span className="text-xs text-purple-400 font-semibold bg-purple-500/20 px-2 py-1 rounded">
-                      {course.level}
-                    </span>
-                  </div>
-                  
-                  <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300">
-                    {course.title}
-                  </h3>
-                  
-                  <p className="text-slate-300 mb-4 leading-relaxed text-sm">
-                    {course.description}
-                  </p>
-                  
-                  {/* Modules List */}
-                  <div className="mb-4 space-y-2">
-                    {course.modules.map((module, i) => (
-                      <div key={i} className="flex items-center text-xs text-slate-400">
-                        <svg className="w-3 h-3 mr-2 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
-                        </svg>
-                        {module}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="border-t border-slate-700/50 pt-4 mt-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-3xl font-bold text-cyan-400">{course.price}</span>
-                        <div className="flex flex-col">
-                          <span className="text-slate-500 line-through text-xs">{course.originalPrice}</span>
-                          <span className="text-emerald-400 text-xs font-semibold">Save 33%</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <a 
-                      href="#" 
-                      className="group/btn w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-6 py-3 rounded-full font-semibold transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-cyan-500/30"
-                    >
-                      <span>Enroll Now</span>
-                      <svg className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
       <section className="py-20 bg-gradient-to-br from-slate-900 to-slate-950 relative overflow-hidden">
         {/* Background Trading Elements */}
         <div className="absolute inset-0 opacity-10">
@@ -949,7 +751,7 @@ export default function Home() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fadeInUp mb-8" style={{ animationDelay: '0.4s' }}>
               <a
-                href="#"
+                href="/student-application"
                 className="group bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-10 py-5 rounded-full font-bold text-lg shadow-2xl hover:shadow-cyan-500/40 transform hover:scale-105 transition-all duration-300 flex items-center space-x-3"
               >
                 <span>Enroll Now - Limited Spots</span>
@@ -959,7 +761,7 @@ export default function Home() {
               </a>
 
               <a
-                href="#"
+                href="contact"
                 className="group border-2 border-cyan-400/50 text-cyan-300 hover:text-white px-10 py-5 rounded-full font-bold text-lg hover:bg-cyan-500/20 hover:border-cyan-400 backdrop-blur-sm transition-all duration-300 flex items-center space-x-3 shadow-lg"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -993,7 +795,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Custom CSS for animations */}
       <style jsx>{`
         @keyframes fadeInUp {
           from {

@@ -90,8 +90,9 @@ export default function Navbar() {
             {[
               { href: "/", label: "Home" },
               { href: "/about", label: "About" },
+              { href: "/course", label: "Courses" },
               { href: "/contact", label: "Contact" },
-              { href: "/students", label: "Admin Dashboard" },
+              { href: "/admin-board", label: "Admin Dashboard" },
             ].map((item, index) => (
               <li key={item.href}>
                 <Link
@@ -106,7 +107,7 @@ export default function Navbar() {
             ))}
             <li className="pt-2">
               <Link
-                href="/enroll"
+                href="/student-application"
                 className="block bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-3 px-4 rounded-lg font-semibold text-center transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-cyan-500/25"
                 onClick={() => setIsOpen(false)}
               >

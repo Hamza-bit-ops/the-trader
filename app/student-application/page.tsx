@@ -71,6 +71,7 @@ const StudentApplicationForm = () => {
                 throw new Error('Failed to submit application');
             }
         } catch (_error) {
+            console.error('Application submission failed:', _error);
             alert('Error submitting application. Please try again.');
         }
 
