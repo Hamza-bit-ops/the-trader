@@ -417,9 +417,33 @@ const StudentManagementSystem = () => {
       <html>
       <head>
         <title>Student Details - ${student.name}</title>
-        <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { font-family: 'Arial', sans-serif; background: #0f172a; padding: 20px; color: #f1f5f9; font-size: 14px; }
+        <style> 
+           @media print {
+            @page {
+              size: A4;
+              margin: 10mm;
+            }
+            body {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              color-adjust: exact;
+            }
+          }
+          
+          * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+          }
+  body { 
+            font-family: 'Arial', 'Helvetica', sans-serif; 
+            background: #0f172a; 
+            padding: 20px; 
+            color: #f1f5f9; 
+            font-size: 16px;
+            line-height: 1.5;
+            font-weight: 600;
+          }
           .container { max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1e293b, #334155); border-radius: 15px; border: 2px solid #f59e0b; overflow: hidden; }
           .header { background: linear-gradient(135deg, #f59e0b, #eab308); color: #0f172a; padding: 25px; text-align: center; }
           .header h1 { font-size: 1.8em; margin-bottom: 5px; font-weight: bold; }
@@ -699,72 +723,72 @@ const StudentManagementSystem = () => {
   );
 
 
-if (!isAuthenticated) {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
-      <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-md p-8 transform animate-modal border border-slate-200/50">
-        <div className="text-center mb-8">
-          <div className="inline-block p-4 bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl shadow-lg mb-4">
-            <Lock className="w-16 h-16 text-white" />
-          </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-2">
-            Student Management
-          </h1>
-          <p className="text-gray-600 text-lg">Enter password to access the system</p>
-        </div>
-
-        <form onSubmit={handlePasswordSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-3">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-amber-600 w-5 h-5" />
-              <input
-                type={showPassword ? "text" : "password"}
-                value={passwordInput}
-                onChange={(e) => {
-                  setPasswordInput(e.target.value);
-                  setPasswordError('');
-                }}
-                className="w-full pl-12 pr-12 py-4 border-2 border-amber-200 rounded-2xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-300 bg-white/70 backdrop-blur-sm text-gray-800 placeholder-gray-500"
-                placeholder="Enter password"
-                autoFocus
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-amber-600 transition-colors"
-              >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+        <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-md p-8 transform animate-modal border border-slate-200/50">
+          <div className="text-center mb-8">
+            <div className="inline-block p-4 bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl shadow-lg mb-4">
+              <Lock className="w-16 h-16 text-white" />
             </div>
-            {passwordError && (
-              <div className="mt-3 flex items-center space-x-2 text-red-600">
-                <AlertCircle className="w-4 h-4" />
-                <span className="text-sm font-medium">{passwordError}</span>
-              </div>
-            )}
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-2">
+              Student Management
+            </h1>
+            <p className="text-gray-600 text-lg">Enter password to access the system</p>
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3"
-          >
-            <Lock className="w-5 h-5" />
-            <span>Login</span>
-          </button>
-        </form>
+          <form onSubmit={handlePasswordSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-amber-600 w-5 h-5" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={passwordInput}
+                  onChange={(e) => {
+                    setPasswordInput(e.target.value);
+                    setPasswordError('');
+                  }}
+                  className="w-full pl-12 pr-12 py-4 border-2 border-amber-200 rounded-2xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-300 bg-white/70 backdrop-blur-sm text-gray-800 placeholder-gray-500"
+                  placeholder="Enter password"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-amber-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              {passwordError && (
+                <div className="mt-3 flex items-center space-x-2 text-red-600">
+                  <AlertCircle className="w-4 h-4" />
+                  <span className="text-sm font-medium">{passwordError}</span>
+                </div>
+              )}
+            </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
-            Th3 Trad3rs Consultancy © 2024
-          </p>
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3"
+            >
+              <Lock className="w-5 h-5" />
+              <span>Login</span>
+            </button>
+          </form>
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-gray-500">
+              Th3 Trad3rs Consultancy © 2024
+            </p>
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   return (
 
@@ -799,13 +823,13 @@ if (!isAuthenticated) {
               <span>Add New Student</span>
 
               <button
-  onClick={handleLogout}
-  className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-2"
-  title="Logout"
->
-  <LogOut className="w-5 h-5" />
-  <span className="hidden sm:block">Logout</span>
-</button>
+                onClick={handleLogout}
+                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-2"
+                title="Logout"
+              >
+                <LogOut className="w-5 h-5" />
+                <span className="hidden sm:block">Logout</span>
+              </button>
             </button>
           </div>
 

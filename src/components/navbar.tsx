@@ -58,10 +58,10 @@ export default function Navbar() {
         </ul>
 
         {/* CTA Button for Desktop */}
-        <div className="hidden md:block">
+      <div className="hidden md:block">
           <Link
             href="/student-application"
-            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-6 py-2.5 rounded-full font-semibold shadow-lg hover:shadow-xl hover:shadow-cyan-500/25 transform hover:scale-105 transition-all duration-300"
+            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-6 py-2.5 rounded-full font-semibold shadow-lg hover:shadow-xl hover:shadow-cyan-500/25 transform hover:scale-105 transition-all duration-300 whitespace-nowrap"
           >
             Get Started
           </Link>
