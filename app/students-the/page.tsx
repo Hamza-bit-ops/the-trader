@@ -404,7 +404,7 @@ const StudentManagementSystem = () => {
     setSelectedStudent(student);
     setShowDetailModal(true);
   };
-  const downloadPDF = (student: Student) => {
+   const downloadPDF = (student: Student) => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
     const formatCurrency = (amount: number, type: 'local' | 'foreigner') => {
@@ -421,12 +421,19 @@ const StudentManagementSystem = () => {
            @media print {
             @page {
               size: A4;
-              margin: 10mm;
+              margin: 0;
             }
             body {
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
               color-adjust: exact;
+              margin: 0;
+              padding: 0;
+            }
+            .container {
+              min-height: 100vh;
+              margin: 0;
+              border-radius: 0;
             }
           }
           
@@ -437,12 +444,23 @@ const StudentManagementSystem = () => {
           }
   body { 
             font-family: 'Arial', 'Helvetica', sans-serif; 
-            background: #0f172a; 
-            padding: 20px; 
+            background: #000000; 
+            padding: 0; 
             color: #f1f5f9; 
             font-size: 16px;
             line-height: 1.5;
             font-weight: 600;
+            margin: 0;
+          }
+          .container { 
+            width: 100%; 
+            min-height: 100vh; 
+            margin: 0; 
+            background: #000000; 
+            border-radius: 0; 
+            border: none; 
+            overflow: hidden; 
+            padding: 40px;
           }
           .container { max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1e293b, #334155); border-radius: 15px; border: 2px solid #f59e0b; overflow: hidden; }
           .header { background: linear-gradient(135deg, #f59e0b, #eab308); color: #0f172a; padding: 25px; text-align: center; }
