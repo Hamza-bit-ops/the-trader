@@ -404,7 +404,7 @@ const StudentManagementSystem = () => {
     setSelectedStudent(student);
     setShowDetailModal(true);
   };
- const downloadPDF = (student: Student) => {
+const downloadPDF = (student: Student) => {
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
   
@@ -422,7 +422,7 @@ const StudentManagementSystem = () => {
         @media print {
           @page {
             size: A4;
-            margin: 15mm;
+            margin: 10mm;
           }
           body {
             -webkit-print-color-adjust: exact;
@@ -438,7 +438,7 @@ const StudentManagementSystem = () => {
             margin: 0;
             border-radius: 0;
             box-shadow: none;
-            border: 2px solid #000000;
+            border: none;
           }
           * {
             color: black !important;
@@ -458,8 +458,8 @@ const StudentManagementSystem = () => {
           background: #ffffff; 
           padding: 0; 
           color: #000000; 
-          font-size: 18px;
-          line-height: 1.6;
+          font-size: 14px;
+          line-height: 1.4;
           font-weight: bold;
           margin: 0;
         }
@@ -469,139 +469,137 @@ const StudentManagementSystem = () => {
           min-height: 100vh; 
           margin: 0; 
           background: #ffffff; 
-          border-radius: 0; 
-          border: 3px solid #000000; 
+          border: 2px solid #000000; 
           overflow: hidden; 
-          padding: 30px;
+          padding: 20px;
         }
         
         .header { 
           background: #000000 !important; 
           color: #ffffff !important; 
-          padding: 30px; 
+          padding: 20px; 
           text-align: center; 
-          border-bottom: 4px solid #000000;
-          margin-bottom: 25px;
+          border-bottom: 3px solid #000000;
+          margin-bottom: 15px;
         }
         
         .header h1 { 
-          font-size: 32px; 
-          margin-bottom: 10px; 
+          font-size: 24px; 
+          margin-bottom: 5px; 
           font-weight: bold;
           color: #ffffff !important;
         }
         
         .header p { 
-          font-size: 20px; 
-          opacity: 0.9; 
+          font-size: 16px; 
           color: #ffffff !important;
           font-weight: bold;
         }
         
         .content { 
-          padding: 25px; 
+          padding: 15px; 
         }
         
         .student-info { 
           display: flex; 
           align-items: center; 
-          margin-bottom: 30px; 
-          padding-bottom: 25px; 
-          border-bottom: 3px solid #000000; 
+          margin-bottom: 20px; 
+          padding-bottom: 15px; 
+          border-bottom: 2px solid #000000; 
         }
         
         .profile { 
-          width: 100px; 
-          height: 100px; 
+          width: 80px; 
+          height: 80px; 
           border-radius: 50%; 
           background: #000000 !important; 
           display: flex; 
           align-items: center; 
           justify-content: center; 
           color: #ffffff !important; 
-          font-size: 36px; 
+          font-size: 24px; 
           font-weight: bold; 
-          margin-right: 25px; 
+          margin-right: 20px; 
           overflow: hidden; 
-          border: 3px solid #000000;
+          border: 2px solid #000000;
         }
         
         .student-details h2 { 
-          font-size: 28px; 
-          margin-bottom: 8px; 
+          font-size: 20px; 
+          margin-bottom: 5px; 
           color: #000000 !important;
           font-weight: bold;
         }
         
         .student-details p { 
-          margin: 5px 0; 
+          margin: 3px 0; 
           color: #000000 !important; 
-          font-size: 18px;
+          font-size: 14px;
           font-weight: bold;
         }
         
         .info-grid { 
           display: grid; 
           grid-template-columns: 1fr 1fr; 
-          gap: 20px; 
-          margin-bottom: 30px; 
+          gap: 12px; 
+          margin-bottom: 20px; 
         }
         
         .info-item { 
           background: #f8f8f8 !important; 
-          padding: 20px; 
-          border-radius: 8px; 
-          border-left: 5px solid #000000; 
-          border: 2px solid #000000;
+          padding: 12px; 
+          border-radius: 6px; 
+          border-left: 4px solid #000000; 
+          border: 1px solid #000000;
         }
         
         .info-label { 
           font-weight: bold; 
           color: #000000 !important; 
-          font-size: 18px; 
-          margin-bottom: 8px;
+          font-size: 14px; 
+          margin-bottom: 5px;
         }
         
         .info-value { 
           color: #000000 !important; 
-          margin-top: 5px; 
-          font-size: 20px;
+          margin-top: 3px; 
+          font-size: 14px;
           font-weight: bold;
         }
         
         .payment-summary { 
           background: #f8f8f8 !important; 
-          padding: 25px; 
-          border-radius: 8px; 
-          border: 3px solid #000000; 
-          margin-bottom: 25px;
+          padding: 15px; 
+          border-radius: 6px; 
+          border: 2px solid #000000; 
+          margin-bottom: 15px;
         }
         
         .payment-row { 
           display: flex; 
           justify-content: space-between; 
-          margin-bottom: 12px; 
-          font-size: 18px;
+          margin-bottom: 8px; 
+          font-size: 14px;
           font-weight: bold;
         }
         
         .payment-total { 
           font-weight: bold; 
-          font-size: 22px; 
-          border-top: 3px solid #000000; 
-          padding-top: 12px; 
+          font-size: 16px; 
+          border-top: 2px solid #000000; 
+          padding-top: 8px; 
           color: #000000 !important; 
         }
         
         .status-badge { 
           display: inline-block; 
-          padding: 8px 16px; 
-          border-radius: 20px; 
-          font-size: 16px; 
+          padding: 4px 10px; 
+          border-radius: 15px; 
+          font-size: 12px; 
           font-weight: bold; 
           text-transform: capitalize; 
-          margin-left: 12px;
-          border: 2px solid #000000;
+          margin-left: 8px;
+          border: 1px solid #000000;
         }
         
         .status-paid { 
@@ -620,58 +618,62 @@ const StudentManagementSystem = () => {
         }
         
         .stamp-logo {
-          width: 120px;       
-          height: 120px;
+          width: 80px;       
+          height: 80px;
           border-radius: 50%;
           object-fit: cover;
-          margin-top: 15px;
+          margin-top: 10px;
           display: block;
           margin-left: auto;
           opacity: 0.9;
           transform: rotate(-30deg);
-          border: 2px solid #000000;
+          border: 1px solid #000000;
           filter: grayscale(100%);
         }
         
         .notes-section {
-          margin-top: 25px;
-          padding: 20px;
+          margin-top: 15px;
+          padding: 12px;
           background: #f8f8f8 !important;
-          border-radius: 8px;
-          border: 2px solid #000000;
+          border-radius: 6px;
+          border: 1px solid #000000;
         }
         
         .notes-label {
           font-weight: bold;
           color: #000000 !important;
-          margin-bottom: 10px;
-          font-size: 20px;
+          margin-bottom: 5px;
+          font-size: 14px;
         }
         
         .notes-content {
           color: #000000 !important;
-          font-size: 18px;
+          font-size: 14px;
           font-weight: bold;
-          line-height: 1.6;
+          line-height: 1.4;
         }
         
         .footer {
           text-align: center;
-          margin-top: 30px;
-          padding-top: 20px;
-          border-top: 3px solid #000000;
+          margin-top: 15px;
+          padding-top: 10px;
+          border-top: 2px solid #000000;
           color: #000000 !important;
-          font-size: 16px;
+          font-size: 12px;
           font-weight: bold;
         }
         
         .section-title {
-          font-size: 24px;
+          font-size: 16px;
           font-weight: bold;
-          margin: 25px 0 15px 0;
+          margin: 15px 0 10px 0;
           color: #000000 !important;
-          border-bottom: 2px solid #000000;
-          padding-bottom: 8px;
+          border-bottom: 1px solid #000000;
+          padding-bottom: 5px;
+        }
+        
+        strong {
+          font-weight: bold !important;
         }
       </style>
     </head>
@@ -683,7 +685,6 @@ const StudentManagementSystem = () => {
         </div>
         
         <div class="content">
-          <!-- Student Profile Section -->
           <div class="student-info">
             <div class="profile">
               ${student.profilePicture ? 
@@ -702,72 +703,64 @@ const StudentManagementSystem = () => {
             <img src="stamp-removebg-preview.png" class="stamp-logo">
           </div>
 
-          <!-- Personal Information -->
           <div class="section-title">Personal Information</div>
           <div class="info-grid">
             <div class="info-item">
-              <div class="info-label">Course</div>
+              <div class="info-label"><strong>Course</strong></div>
               <div class="info-value">${student.course.charAt(0).toUpperCase() + student.course.slice(1)}</div>
             </div>
             <div class="info-item">
-              <div class="info-label">Student Type</div>
+              <div class="info-label"><strong>Student Type</strong></div>
               <div class="info-value">${student.studentType === 'local' ? 'Local' : 'International'}</div>
             </div>
             <div class="info-item">
-              <div class="info-label">Enrollment Date</div>
+              <div class="info-label"><strong>Enrollment Date</strong></div>
               <div class="info-value">${new Date(student.enrollmentDate).toLocaleDateString('en-GB')}</div>
             </div>
             <div class="info-item">
-              <div class="info-label">Payment Progress</div>
+              <div class="info-label"><strong>Payment Progress</strong></div>
               <div class="info-value">${student.finalAmount > 0 ? Math.round((student.paidAmount / student.finalAmount) * 100) : 0}%</div>
             </div>
           </div>
 
-          <!-- Payment Information -->
           <div class="section-title">Payment Details</div>
           <div class="payment-summary">
             <div class="payment-row">
-              <span>Course Fee:</span>
-              <span>${formatCurrency(student.feeAmount, student.studentType)}</span>
+              <span><strong>Course Fee:</strong></span>
+              <span><strong>${formatCurrency(student.feeAmount, student.studentType)}</strong></span>
             </div>
             ${student.discount > 0 ? `
             <div class="payment-row">
-              <span>Discount (${student.discount}%):</span>
-              <span>-${formatCurrency(student.discountAmount, student.studentType)}</span>
+              <span><strong>Discount (${student.discount}%):</strong></span>
+              <span><strong>-${formatCurrency(student.discountAmount, student.studentType)}</strong></span>
             </div>
             ` : ''}
             <div class="payment-row payment-total">
-              <span>Final Amount:</span>
-              <span>${formatCurrency(student.finalAmount, student.studentType)}</span>
+              <span><strong>Final Amount:</strong></span>
+              <span><strong>${formatCurrency(student.finalAmount, student.studentType)}</strong></span>
             </div>
             <div class="payment-row">
-              <span>Amount Paid:</span>
-              <span>${formatCurrency(student.paidAmount, student.studentType)}</span>
+              <span><strong>Amount Paid:</strong></span>
+              <span><strong>${formatCurrency(student.paidAmount, student.studentType)}</strong></span>
             </div>
             <div class="payment-row">
-              <span>Remaining Balance:</span>
-              <span>${formatCurrency(student.finalAmount - student.paidAmount, student.studentType)}</span>
+              <span><strong>Remaining Balance:</strong></span>
+              <span><strong>${formatCurrency(student.finalAmount - student.paidAmount, student.studentType)}</strong></span>
             </div>
           </div>
 
-          <!-- Additional Notes -->
           ${student.notes ? `
           <div class="notes-section">
-            <div class="notes-label">Additional Notes:</div>
+            <div class="notes-label"><strong>Additional Notes:</strong></div>
             <div class="notes-content">${student.notes}</div>
           </div>
           ` : ''}
 
-          <!-- Footer -->
           <div class="footer">
-            Generated on ${new Date().toLocaleDateString('en-GB', { 
-              day: '2-digit', 
-              month: 'long', 
-              year: 'numeric' 
-            })} at ${new Date().toLocaleTimeString('en-GB', { 
+            <strong>Generated on ${new Date().toLocaleDateString('en-GB')} at ${new Date().toLocaleTimeString('en-GB', { 
               hour: '2-digit', 
               minute: '2-digit' 
-            })}
+            })}</strong>
           </div>
         </div>
       </div>
