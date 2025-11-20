@@ -404,197 +404,384 @@ const StudentManagementSystem = () => {
     setSelectedStudent(student);
     setShowDetailModal(true);
   };
-   const downloadPDF = (student: Student) => {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-    const formatCurrency = (amount: number, type: 'local' | 'foreigner') => {
-      return type === 'local' ?
-        `PKR ${amount.toLocaleString()}` : `$${amount.toLocaleString()}`;
-    };
+ const downloadPDF = (student: Student) => {
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return;
+  
+  const formatCurrency = (amount: number, type: 'local' | 'foreigner') => {
+    return type === 'local' ? 
+      `PKR ${amount.toLocaleString()}` : `$${amount.toLocaleString()}`;
+  };
 
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Student Details - ${student.name}</title>
-        <style> 
-           @media print {
-            @page {
-              size: A4;
-              margin: 0;
-            }
-            body {
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-              color-adjust: exact;
-              margin: 0;
-              padding: 0;
-            }
-            .container {
-              min-height: 100vh;
-              margin: 0;
-              border-radius: 0;
-            }
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Student Details - ${student.name}</title>
+      <style>
+        @media print {
+          @page {
+            size: A4;
+            margin: 15mm;
           }
-          
-          * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-          }
-  body { 
-            font-family: 'Arial', 'Helvetica', sans-serif; 
-            background: #000000; 
-            padding: 0; 
-            color: #f1f5f9; 
-            font-size: 16px;
-            line-height: 1.5;
-            font-weight: 600;
+          body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            color-adjust: exact;
             margin: 0;
+            padding: 0;
+            background: white !important;
+            color: black !important;
           }
-          .container { 
-            width: 100%; 
-            min-height: 100vh; 
-            margin: 0; 
-            background: #000000; 
-            border-radius: 0; 
-            border: none; 
-            overflow: hidden; 
-            padding: 40px;
+          .container {
+            min-height: 100vh;
+            margin: 0;
+            border-radius: 0;
+            box-shadow: none;
+            border: 2px solid #000000;
           }
-          .container { max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1e293b, #334155); border-radius: 15px; border: 2px solid #f59e0b; overflow: hidden; }
-          .header { background: linear-gradient(135deg, #f59e0b, #eab308); color: #0f172a; padding: 25px; text-align: center; }
-          .header h1 { font-size: 1.8em; margin-bottom: 5px; font-weight: bold; }
-          .header p { font-size: 1em; opacity: 0.8; }
-          .content { padding: 25px; }
-          .student-info { display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid #374151; }
-          .profile { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #eab308); display: flex; align-items: center; justify-content: center; color: #0f172a; font-size: 2em; font-weight: bold; margin-right: 20px; overflow: hidden; }
-          .student-details h2 { font-size: 1.4em; margin-bottom: 5px; color: #f59e0b; }
-          .student-details p { margin: 2px 0; color: #cbd5e1; }
-          .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-          .info-item { background: #374151; padding: 12px; border-radius: 8px; border-left: 3px solid #f59e0b; }
-          .info-label { font-weight: bold; color: #f59e0b; font-size: 0.9em; }
-          .info-value { color: #f1f5f9; margin-top: 3px; }
-          .payment-summary { background: #374151; padding: 15px; border-radius: 8px; border: 1px solid #f59e0b; }
-          .payment-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
-          .payment-total { font-weight: bold; font-size: 1.1em; border-top: 1px solid #f59e0b; padding-top: 8px; color: #f59e0b; }
-          .status-badge { display: inline-block; padding: 4px 12px; border-radius: 15px; font-size: 0.8em; font-weight: bold; text-transform: capitalize; margin-left: 10px; }
-          .status-paid { background: #059669; color: white; }
-          .status-partial { background: #d97706; color: white; }
-          .status-pending { background: #dc2626; color: white; }
-          @media print {
-            body { background: white; color: black; }
-            .container { border: 2px solid #f59e0b; }
-            .header { background: #f59e0b; color: black; }
-            .content { color: black; }
-            .info-item { background: #f8f9fa; color: black; }
-            .payment-summary { background: #f8f9fa; color: black; }
+          * {
+            color: black !important;
+            background: white !important;
+            border-color: #000000 !important;
           }
-
+        }
+        
+        * { 
+          margin: 0; 
+          padding: 0; 
+          box-sizing: border-box; 
+        }
+        
+        body { 
+          font-family: 'Arial', 'Helvetica', sans-serif; 
+          background: #ffffff; 
+          padding: 0; 
+          color: #000000; 
+          font-size: 18px;
+          line-height: 1.6;
+          font-weight: bold;
+          margin: 0;
+        }
+        
+        .container { 
+          width: 100%; 
+          min-height: 100vh; 
+          margin: 0; 
+          background: #ffffff; 
+          border-radius: 0; 
+          border: 3px solid #000000; 
+          overflow: hidden; 
+          padding: 30px;
+        }
+        
+        .header { 
+          background: #000000 !important; 
+          color: #ffffff !important; 
+          padding: 30px; 
+          text-align: center; 
+          border-bottom: 4px solid #000000;
+          margin-bottom: 25px;
+        }
+        
+        .header h1 { 
+          font-size: 32px; 
+          margin-bottom: 10px; 
+          font-weight: bold;
+          color: #ffffff !important;
+        }
+        
+        .header p { 
+          font-size: 20px; 
+          opacity: 0.9; 
+          color: #ffffff !important;
+          font-weight: bold;
+        }
+        
+        .content { 
+          padding: 25px; 
+        }
+        
+        .student-info { 
+          display: flex; 
+          align-items: center; 
+          margin-bottom: 30px; 
+          padding-bottom: 25px; 
+          border-bottom: 3px solid #000000; 
+        }
+        
+        .profile { 
+          width: 100px; 
+          height: 100px; 
+          border-radius: 50%; 
+          background: #000000 !important; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center; 
+          color: #ffffff !important; 
+          font-size: 36px; 
+          font-weight: bold; 
+          margin-right: 25px; 
+          overflow: hidden; 
+          border: 3px solid #000000;
+        }
+        
+        .student-details h2 { 
+          font-size: 28px; 
+          margin-bottom: 8px; 
+          color: #000000 !important;
+          font-weight: bold;
+        }
+        
+        .student-details p { 
+          margin: 5px 0; 
+          color: #000000 !important; 
+          font-size: 18px;
+          font-weight: bold;
+        }
+        
+        .info-grid { 
+          display: grid; 
+          grid-template-columns: 1fr 1fr; 
+          gap: 20px; 
+          margin-bottom: 30px; 
+        }
+        
+        .info-item { 
+          background: #f8f8f8 !important; 
+          padding: 20px; 
+          border-radius: 8px; 
+          border-left: 5px solid #000000; 
+          border: 2px solid #000000;
+        }
+        
+        .info-label { 
+          font-weight: bold; 
+          color: #000000 !important; 
+          font-size: 18px; 
+          margin-bottom: 8px;
+        }
+        
+        .info-value { 
+          color: #000000 !important; 
+          margin-top: 5px; 
+          font-size: 20px;
+          font-weight: bold;
+        }
+        
+        .payment-summary { 
+          background: #f8f8f8 !important; 
+          padding: 25px; 
+          border-radius: 8px; 
+          border: 3px solid #000000; 
+          margin-bottom: 25px;
+        }
+        
+        .payment-row { 
+          display: flex; 
+          justify-content: space-between; 
+          margin-bottom: 12px; 
+          font-size: 18px;
+          font-weight: bold;
+        }
+        
+        .payment-total { 
+          font-weight: bold; 
+          font-size: 22px; 
+          border-top: 3px solid #000000; 
+          padding-top: 12px; 
+          color: #000000 !important; 
+        }
+        
+        .status-badge { 
+          display: inline-block; 
+          padding: 8px 16px; 
+          border-radius: 20px; 
+          font-size: 16px; 
+          font-weight: bold; 
+          text-transform: capitalize; 
+          margin-left: 12px;
+          border: 2px solid #000000;
+        }
+        
+        .status-paid { 
+          background: #000000 !important; 
+          color: #ffffff !important; 
+        }
+        
+        .status-partial { 
+          background: #333333 !important; 
+          color: #ffffff !important; 
+        }
+        
+        .status-pending { 
+          background: #666666 !important; 
+          color: #ffffff !important; 
+        }
+        
         .stamp-logo {
-  width: 170px;       
-  height: 170px;
-  border-radius: 50%;   /* circle */
-  object-fit: cover;    /* image crop ho kar fit ho jaye */
-  margin-top: 15px;
-  display: block;
-  margin-left: auto;    /* right side align */
-  opacity: 0.8;         /* thoda transparent */
-  transform: rotate(-30deg);
-}
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>Th3 Trad3rs Consultancy</h1>
-            <p>Student Management System</p>
+          width: 120px;       
+          height: 120px;
+          border-radius: 50%;
+          object-fit: cover;
+          margin-top: 15px;
+          display: block;
+          margin-left: auto;
+          opacity: 0.9;
+          transform: rotate(-30deg);
+          border: 2px solid #000000;
+          filter: grayscale(100%);
+        }
+        
+        .notes-section {
+          margin-top: 25px;
+          padding: 20px;
+          background: #f8f8f8 !important;
+          border-radius: 8px;
+          border: 2px solid #000000;
+        }
+        
+        .notes-label {
+          font-weight: bold;
+          color: #000000 !important;
+          margin-bottom: 10px;
+          font-size: 20px;
+        }
+        
+        .notes-content {
+          color: #000000 !important;
+          font-size: 18px;
+          font-weight: bold;
+          line-height: 1.6;
+        }
+        
+        .footer {
+          text-align: center;
+          margin-top: 30px;
+          padding-top: 20px;
+          border-top: 3px solid #000000;
+          color: #000000 !important;
+          font-size: 16px;
+          font-weight: bold;
+        }
+        
+        .section-title {
+          font-size: 24px;
+          font-weight: bold;
+          margin: 25px 0 15px 0;
+          color: #000000 !important;
+          border-bottom: 2px solid #000000;
+          padding-bottom: 8px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Th3 Trad3rs Consultancy</h1>
+          <p>Student Management System</p>
+        </div>
+        
+        <div class="content">
+          <!-- Student Profile Section -->
+          <div class="student-info">
+            <div class="profile">
+              ${student.profilePicture ? 
+                `<img src="${student.profilePicture}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; filter: grayscale(100%);" />` : 
+                student.name.charAt(0).toUpperCase()}
+            </div>
+            <div class="student-details">
+              <h2>${student.name}</h2>
+              <p><strong>Email:</strong> ${student.email}</p>
+              <p><strong>Phone:</strong> ${student.phone}</p>
+              <p><strong>CNIC/Passport:</strong> ${student.cnic}</p>
+              <p><strong>Status:</strong> 
+                <span class="status-badge status-${student.status}">${student.status}</span>
+              </p>
+            </div>
+            <img src="stamp-removebg-preview.png" class="stamp-logo">
           </div>
-          <div class="content">
-            <div class="student-info">
-              <div class="profile">
-                ${student.profilePicture ?
-        `<img src="${student.profilePicture}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />`
-        : student.name.charAt(0).toUpperCase()}
-              </div>
-              <div class="student-details">
-                <h2>${student.name}</h2>
-                <p><strong>Email:</strong> ${student.email}</p>
-                <p><strong>Phone:</strong> ${student.phone}</p>
-                <p><strong>CNIC:</strong> ${student.cnic}
-                <p><strong >Status:</strong> <span class="status-badge status-${student.status}">${student.status}</span>
-                </p>
 
-             
-              </div>
-                  <img src="stamp-removebg-preview.png"   class="stamp-logo">
+          <!-- Personal Information -->
+          <div class="section-title">Personal Information</div>
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Course</div>
+              <div class="info-value">${student.course.charAt(0).toUpperCase() + student.course.slice(1)}</div>
             </div>
-            <div class="info-grid">
-              <div class="info-item">
-                <div class="info-label">Course</div>
-                <div class="info-value">${student.course.charAt(0).toUpperCase() + student.course.slice(1)}</div>
-              </div>
-              <div class="info-item">
-                <div class="info-label">Student Type</div>
-                <div class="info-value">${student.studentType === 'local' ? 'Local' : 'International'}</div>
-              </div>
-              <div class="info-item">
-                <div class="info-label">Enrollment Date</div>
-                <div class="info-value">${new Date(student.enrollmentDate).toLocaleDateString('en-GB')}</div>
-              </div>
-              <div class="info-item">
-                <div class="info-label">Payment Progress</div>
-                <div class="info-value">${student.finalAmount > 0 ? Math.round((student.paidAmount / student.finalAmount) * 100) : 0}%</div>
-              </div>
+            <div class="info-item">
+              <div class="info-label">Student Type</div>
+              <div class="info-value">${student.studentType === 'local' ? 'Local' : 'International'}</div>
             </div>
-               
+            <div class="info-item">
+              <div class="info-label">Enrollment Date</div>
+              <div class="info-value">${new Date(student.enrollmentDate).toLocaleDateString('en-GB')}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Payment Progress</div>
+              <div class="info-value">${student.finalAmount > 0 ? Math.round((student.paidAmount / student.finalAmount) * 100) : 0}%</div>
+            </div>
+          </div>
 
-
-            <div class="payment-summary">
-              <div class="payment-row">
-                <span>Course Fee:</span>
-                <span>${formatCurrency(student.feeAmount, student.studentType)}</span>
-              </div>
-              ${student.discount > 0 ? `
-              <div class="payment-row">
-                <span>Discount (${student.discount}%):</span>
-                <span>-${formatCurrency(student.discountAmount, student.studentType)}</span>
-              </div>
-              ` : ''}
-              <div class="payment-row payment-total">
-                <span>Final Amount:</span>
-                <span>${formatCurrency(student.finalAmount, student.studentType)}</span>
-              </div>
-              <div class="payment-row">
-                <span>Paid:</span>
-                <span style="color: #059669;">${formatCurrency(student.paidAmount, student.studentType)}</span>
-              </div>
-              <div class="payment-row">
-                <span>Remaining:</span>
-                <span style="color: #dc2626;">${formatCurrency(student.finalAmount - student.paidAmount, student.studentType)}</span>
-              </div>
+          <!-- Payment Information -->
+          <div class="section-title">Payment Details</div>
+          <div class="payment-summary">
+            <div class="payment-row">
+              <span>Course Fee:</span>
+              <span>${formatCurrency(student.feeAmount, student.studentType)}</span>
             </div>
-            ${student.notes ? `
-            <div style="margin-top: 15px; padding: 12px; background: #374151; border-radius: 8px; border-left: 3px solid #f59e0b;">
-              <div style="font-weight: bold; color: #f59e0b; margin-bottom: 5px;">Notes:</div>
-              <div style="color: #cbd5e1; font-size: 0.9em;">${student.notes}</div>
+            ${student.discount > 0 ? `
+            <div class="payment-row">
+              <span>Discount (${student.discount}%):</span>
+              <span>-${formatCurrency(student.discountAmount, student.studentType)}</span>
             </div>
             ` : ''}
-            <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #374151; color: #94a3b8; font-size: 0.8em;">
-              Generated on ${new Date().toLocaleDateString('en-GB')} at ${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+            <div class="payment-row payment-total">
+              <span>Final Amount:</span>
+              <span>${formatCurrency(student.finalAmount, student.studentType)}</span>
+            </div>
+            <div class="payment-row">
+              <span>Amount Paid:</span>
+              <span>${formatCurrency(student.paidAmount, student.studentType)}</span>
+            </div>
+            <div class="payment-row">
+              <span>Remaining Balance:</span>
+              <span>${formatCurrency(student.finalAmount - student.paidAmount, student.studentType)}</span>
             </div>
           </div>
-        </div>
-      </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
 
-    setTimeout(() => {
-      printWindow.print();
-    }, 250);
-  };
+          <!-- Additional Notes -->
+          ${student.notes ? `
+          <div class="notes-section">
+            <div class="notes-label">Additional Notes:</div>
+            <div class="notes-content">${student.notes}</div>
+          </div>
+          ` : ''}
+
+          <!-- Footer -->
+          <div class="footer">
+            Generated on ${new Date().toLocaleDateString('en-GB', { 
+              day: '2-digit', 
+              month: 'long', 
+              year: 'numeric' 
+            })} at ${new Date().toLocaleTimeString('en-GB', { 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            })}
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `);
+  
+  printWindow.document.close();
+  printWindow.focus();
+
+  setTimeout(() => {
+    printWindow.print();
+  }, 500);
+};
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'paid': return 'bg-emerald-50 text-emerald-800 border border-emerald-300 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-700';
